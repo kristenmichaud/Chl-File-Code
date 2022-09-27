@@ -1,0 +1,5780 @@
+---
+title: "Michaud_et_al_Coms_Bio_Seasonal_Chlorophyll-a_Code"
+output: html_document
+date: '2022-09-27'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ncdf4)
+library(raster)
+library(rgdal)
+library(ggplot2)
+library(tidyverse)
+library(janitor)
+```
+
+
+```{r}
+## All chlorophyll-a data were mapped monthly files from the Aqua MODIS satellite that were publicly available from: 
+## https://oceancolor.gsfc.nasa.gov/data/10.5067/AQUA/MODIS/L3M/CHL/2018/
+
+#NASA Goddard Space Flight Center, Ocean Ecology Laboratory, Ocean Biology Processing Group. Moderate-resolution Imaging Spectroradiometer (MODIS) Aqua Chlorophyll Data; 2018 Reprocessing. NASA OB.DAAC, Greenbelt, MD, USA. doi: 10.5067/AQUA/MODIS/L3M/CHL/2018.Accessed on 07/20/2022
+
+## Monthly binned files were averaged to align with the seasonal sampling scheme of SBC LTER. Seasons corresponded to: Winter = Dec, Jan, Feb; Spring = Mar, Apr, May, Summer = June, July, August; Fall = Sep, Oct, Nov
+
+### 2002 jul
+raster_2002jul <- "A20021822002212.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2002jula <- raster(raster_2002jul)
+raster_2002jula
+
+ROI <- extent(-120.5,-119.5, 33.9, 34.6)
+ROI
+
+r.chl.2002jul <- crop(raster_2002jula, ROI)
+
+# Santa Barbara Coastal LTER, D. Reed, and R. Miller. 2021. SBC LTER: Reef: Kelp Forest Community Dynamics: Transect depth data ver 7. Environmental Data Initiative. https://doi.org/10.6073/pasta/c4f5b56d546309d0fa1d52a61bfb42d4 (Accessed 2022-09-27).
+# Read in SBC LTER benthic transect locations:
+coordinates_a <- read.csv("Benthic_Transect_Depths_coors.csv") %>% 
+  janitor::clean_names() %>% 
+  dplyr::select(site, latitude, longitude) %>% 
+  group_by(site) %>% 
+  summarise(lat = mean(latitude), lon = mean(longitude))
+
+# Modify the reef locations by 2km offshore to reduce likelihood of bin overlap with land (Chl files are in 4km bins)
+coordinates <- coordinates_a %>% 
+  mutate(lat_off = case_when(
+    site == "ABUR" ~ (lat - 0.018),
+    site == "AHND" ~ (lat - 0.018),
+    site == "AQUE" ~ (lat - 0.018),
+    site == "BULL" ~ (lat - 0.018),
+    site == "CARP" ~ (lat - 0.018),
+    site == "GOLB" ~ (lat - 0.018),
+    site == "IVEE" ~ (lat - 0.018),
+    site == "MOHK" ~ (lat - 0.018),
+    site == "NAPL" ~ (lat - 0.018),
+    site == "SCDI" ~ (lat + 0.018),
+    site == "SCTW" ~ (lat + 0.018)))
+
+lat.pts <- coordinates$lat_off
+lon.pts <- coordinates$lon
+extract.pts <- cbind(lon.pts, lat.pts)
+chl.2002jul <- raster::extract(r.chl.2002jul, extract.pts, sp = T)
+
+plot(r.chl.2002jul) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2002 aug
+raster_2002aug <- "A20022132002243.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2002auga <- raster(raster_2002aug)
+raster_2002auga
+
+r.chl.2002aug <- crop(raster_2002auga, ROI)
+
+chl.2002aug <- raster::extract(r.chl.2002aug, extract.pts, sp = T)
+
+plot(r.chl.2002aug) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2002 sep
+raster_2002sep <- "A20022442002273.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2002sepa <- raster(raster_2002sep)
+raster_2002sepa
+
+r.chl.2002sep <- crop(raster_2002sepa, ROI)
+
+chl.2002sep <- raster::extract(r.chl.2002sep, extract.pts, sp = T)
+
+plot(r.chl.2002sep) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2002 oct
+raster_2002oct <- "A20022742002304.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2002octa <- raster(raster_2002oct)
+raster_2002octa
+
+r.chl.2002oct <- crop(raster_2002octa, ROI)
+
+chl.2002oct <- raster::extract(r.chl.2002oct, extract.pts, sp = T)
+
+plot(r.chl.2002oct) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2002 nov
+raster_2002nov <- "A20023052002334.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2002nova <- raster(raster_2002nov)
+raster_2002nova
+
+r.chl.2002nov <- crop(raster_2002nova, ROI)
+
+chl.2002nov <- raster::extract(r.chl.2002nov, extract.pts, sp = T)
+
+plot(r.chl.2002nov) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2002 dec
+raster_2002dec <- "A20023352002365.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2002deca <- raster(raster_2002dec)
+raster_2002deca
+
+r.chl.2002dec <- crop(raster_2002deca, ROI)
+
+chl.2002dec <- raster::extract(r.chl.2002dec, extract.pts, sp = T)
+
+plot(r.chl.2002dec) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2003 jan
+raster_2003jan <- "A20030012003031.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2003jana <- raster(raster_2003jan)
+raster_2003jana
+
+r.chl.2003jan <- crop(raster_2003jana, ROI)
+
+chl.2003jan <- raster::extract(r.chl.2003jan, extract.pts, sp = T)
+
+plot(r.chl.2003jan) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2003 feb
+raster_2003feb <- "A20030322003059.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2003feba <- raster(raster_2003feb)
+raster_2003feba
+
+r.chl.2003feb <- crop(raster_2003feba, ROI)
+
+chl.2003feb <- raster::extract(r.chl.2003feb, extract.pts, sp = T)
+
+plot(r.chl.2003feb) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2003 mar
+raster_2003mar <- "A20030602003090.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2003mara <- raster(raster_2003mar)
+raster_2003mara
+
+r.chl.2003mar <- crop(raster_2003mara, ROI)
+
+chl.2003mar <- raster::extract(r.chl.2003mar, extract.pts, sp = T)
+
+plot(r.chl.2003mar) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2003 apr
+raster_2003apr <- "A20030912003120.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2003apra <- raster(raster_2003apr)
+raster_2003apra
+
+r.chl.2003apr <- crop(raster_2003apra, ROI)
+
+chl.2003apr <- raster::extract(r.chl.2003apr, extract.pts, sp = T)
+
+plot(r.chl.2003apr) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2003 may
+raster_2003may <- "A20031212003151.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2003maya <- raster(raster_2003may)
+raster_2003maya
+
+r.chl.2003may <- crop(raster_2003maya, ROI)
+
+chl.2003may <- raster::extract(r.chl.2003may, extract.pts, sp = T)
+
+plot(r.chl.2003may) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2003 jun
+raster_2003jun <- "A20031522003181.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2003juna <- raster(raster_2003jun)
+raster_2003juna
+
+r.chl.2003jun <- crop(raster_2003juna, ROI)
+
+chl.2003jun <- raster::extract(r.chl.2003jun, extract.pts, sp = T)
+
+plot(r.chl.2003jun) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2003 jul
+raster_2003jul <- "A20031822003212.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2003jula <- raster(raster_2003jul)
+raster_2003jula
+
+r.chl.2003jul <- crop(raster_2003jula, ROI)
+
+chl.2003jul <- raster::extract(r.chl.2003jul, extract.pts, sp = T)
+
+plot(r.chl.2003jul) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2003 aug
+raster_2003aug <- "A20032132003243.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2003auga <- raster(raster_2003aug)
+raster_2003auga
+
+r.chl.2003aug <- crop(raster_2003auga, ROI)
+
+chl.2003aug <- raster::extract(r.chl.2003aug, extract.pts, sp = T)
+
+plot(r.chl.2003aug) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2003 sep
+raster_2003sep <- "A20032442003273.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2003sepa <- raster(raster_2003sep)
+raster_2003sepa
+
+r.chl.2003sep <- crop(raster_2003sepa, ROI)
+
+chl.2003sep <- raster::extract(r.chl.2003sep, extract.pts, sp = T)
+
+plot(r.chl.2003sep) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2003 oct
+raster_2003oct <- "A20032742003304.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2003octa <- raster(raster_2003oct)
+raster_2003octa
+
+r.chl.2003oct <- crop(raster_2003octa, ROI)
+
+chl.2003oct <- raster::extract(r.chl.2003oct, extract.pts, sp = T)
+
+plot(r.chl.2003oct) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2003 nov
+raster_2003nov <- "A20033052003334.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2003nova <- raster(raster_2003nov)
+raster_2003nova
+
+r.chl.2003nov <- crop(raster_2003nova, ROI)
+
+chl.2003nov <- raster::extract(r.chl.2003nov, extract.pts, sp = T)
+
+plot(r.chl.2003nov) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2003 dec
+raster_2003dec <- "A20033352003365.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2003deca <- raster(raster_2003dec)
+raster_2003deca
+
+r.chl.2003dec <- crop(raster_2003deca, ROI)
+
+chl.2003dec <- raster::extract(r.chl.2003dec, extract.pts, sp = T)
+
+plot(r.chl.2003dec) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2004 jan
+raster_2004jan <- "A20040012004031.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2004jana <- raster(raster_2004jan)
+raster_2004jana
+
+r.chl.2004jan <- crop(raster_2004jana, ROI)
+
+chl.2004jan <- raster::extract(r.chl.2004jan, extract.pts, sp = T)
+
+plot(r.chl.2004jan) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2004 feb
+raster_2004feb <- "A20040322004060.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2004feba <- raster(raster_2004feb)
+raster_2004feba
+
+r.chl.2004feb <- crop(raster_2004feba, ROI)
+
+chl.2004feb <- raster::extract(r.chl.2004feb, extract.pts, sp = T)
+
+plot(r.chl.2004feb) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2004 mar
+raster_2004mar <- "A20040612004091.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2004mara <- raster(raster_2004mar)
+raster_2004mara
+
+r.chl.2004mar <- crop(raster_2004mara, ROI)
+
+chl.2004mar <- raster::extract(r.chl.2004mar, extract.pts, sp = T)
+
+plot(r.chl.2004mar) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2004 apr
+raster_2004apr <- "A20040922004121.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2004apra <- raster(raster_2004apr)
+raster_2004apra
+
+r.chl.2004apr <- crop(raster_2004apra, ROI)
+
+chl.2004apr <- raster::extract(r.chl.2004apr, extract.pts, sp = T)
+
+plot(r.chl.2004apr) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2004 may
+raster_2004may <- "A20041222004152.L3m_MO_CHL_chlor_a_4km.nc "
+raster_2004maya <- raster(raster_2004may)
+raster_2004maya
+
+r.chl.2004may <- crop(raster_2004maya, ROI)
+
+chl.2004may <- raster::extract(r.chl.2004may, extract.pts, sp = T)
+
+plot(r.chl.2004may) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2004 jun
+raster_2004jun <- "A20041532004182.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2004juna <- raster(raster_2004jun)
+raster_2004juna
+
+r.chl.2004jun <- crop(raster_2004juna, ROI)
+
+chl.2004jun <- raster::extract(r.chl.2004jun, extract.pts, sp = T)
+
+plot(r.chl.2004jun) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2004 jul
+raster_2004jul <- "A20041832004213.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2004jula <- raster(raster_2004jul)
+raster_2004jula
+
+r.chl.2004jul <- crop(raster_2004jula, ROI)
+
+chl.2004jul <- raster::extract(r.chl.2004jul, extract.pts, sp = T)
+
+plot(r.chl.2004jul) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2004 aug
+raster_2004aug <- "A20042142004244.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2004auga <- raster(raster_2004aug)
+raster_2004auga
+
+r.chl.2004aug <- crop(raster_2004auga, ROI)
+
+chl.2004aug <- raster::extract(r.chl.2004aug, extract.pts, sp = T)
+
+plot(r.chl.2004aug) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2004 sep
+raster_2004sep <- "A20042452004274.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2004sepa <- raster(raster_2004sep)
+raster_2004sepa
+
+r.chl.2004sep <- crop(raster_2004sepa, ROI)
+
+chl.2004sep <- raster::extract(r.chl.2004sep, extract.pts, sp = T)
+
+plot(r.chl.2004sep) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2004 oct
+raster_2004oct <- "A20042752004305.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2004octa <- raster(raster_2004oct)
+raster_2004octa
+
+r.chl.2004oct <- crop(raster_2004octa, ROI)
+
+chl.2004oct <- raster::extract(r.chl.2004oct, extract.pts, sp = T)
+
+plot(r.chl.2004oct) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2004 nov
+raster_2004nov <- "A20043062004335.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2004nova <- raster(raster_2004nov)
+raster_2004nova
+
+r.chl.2004nov <- crop(raster_2004nova, ROI)
+
+chl.2004nov <- raster::extract(r.chl.2004nov, extract.pts, sp = T)
+
+plot(r.chl.2004nov) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2004 dec
+raster_2004dec <- "A20043362004366.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2004deca <- raster(raster_2004dec)
+raster_2004deca
+
+r.chl.2004dec <- crop(raster_2004deca, ROI)
+
+chl.2004dec <- raster::extract(r.chl.2004dec, extract.pts, sp = T)
+
+plot(r.chl.2004dec) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+
+### 2005 jan
+raster_2005jan <- "A20050012005031.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2005jana <- raster(raster_2005jan)
+raster_2005jana
+
+r.chl.2005jan <- crop(raster_2005jana, ROI)
+
+chl.2005jan <- raster::extract(r.chl.2005jan, extract.pts, sp = T)
+
+plot(r.chl.2005jan) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2005 feb
+raster_2005feb <- "A20050322005059.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2005feba <- raster(raster_2005feb)
+raster_2005feba
+
+r.chl.2005feb <- crop(raster_2005feba, ROI)
+
+chl.2005feb <- raster::extract(r.chl.2005feb, extract.pts, sp = T)
+
+plot(r.chl.2005feb) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2005 mar
+raster_2005mar <- "A20050602005090.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2005mara <- raster(raster_2005mar)
+raster_2005mara
+
+r.chl.2005mar <- crop(raster_2005mara, ROI)
+
+chl.2005mar <- raster::extract(r.chl.2005mar, extract.pts, sp = T)
+
+plot(r.chl.2005mar) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2005 apr
+raster_2005apr <- "A20050912005120.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2005apra <- raster(raster_2005apr)
+raster_2005apra
+
+r.chl.2005apr <- crop(raster_2005apra, ROI)
+
+chl.2005apr <- raster::extract(r.chl.2005apr, extract.pts, sp = T)
+
+plot(r.chl.2005apr) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2005 may
+raster_2005may <- "A20051212005151.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2005maya <- raster(raster_2005may)
+raster_2005maya
+
+r.chl.2005may <- crop(raster_2005maya, ROI)
+
+chl.2005may <- raster::extract(r.chl.2005may, extract.pts, sp = T)
+
+plot(r.chl.2005may) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2005 jun
+raster_2005jun <- "A20051522005181.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2005juna <- raster(raster_2005jun)
+raster_2005juna
+
+r.chl.2005jun <- crop(raster_2005juna, ROI)
+
+chl.2005jun <- raster::extract(r.chl.2005jun, extract.pts, sp = T)
+
+plot(r.chl.2005jun) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2005 jul
+raster_2005jul <- "A20051822005212.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2005jula <- raster(raster_2005jul)
+raster_2005jula
+
+r.chl.2005jul <- crop(raster_2005jula, ROI)
+
+chl.2005jul <- raster::extract(r.chl.2005jul, extract.pts, sp = T)
+
+plot(r.chl.2005jul) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2005 aug
+raster_2005aug <- "A20052132005243.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2005auga <- raster(raster_2005aug)
+raster_2005auga
+
+r.chl.2005aug <- crop(raster_2005auga, ROI)
+
+chl.2005aug <- raster::extract(r.chl.2005aug, extract.pts, sp = T)
+
+plot(r.chl.2005aug) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2005 sep
+raster_2005sep <- "A20052442005273.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2005sepa <- raster(raster_2005sep)
+raster_2005sepa
+
+r.chl.2005sep <- crop(raster_2005sepa, ROI)
+
+chl.2005sep <- raster::extract(r.chl.2005sep, extract.pts, sp = T)
+
+plot(r.chl.2005sep) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2005 oct
+raster_2005oct <- "A20052742005304.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2005octa <- raster(raster_2005oct)
+raster_2005octa
+
+r.chl.2005oct <- crop(raster_2005octa, ROI)
+
+chl.2005oct <- raster::extract(r.chl.2005oct, extract.pts, sp = T)
+
+plot(r.chl.2005oct) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2005 nov
+raster_2005nov <- "A20053052005334.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2005nova <- raster(raster_2005nov)
+raster_2005nova
+
+r.chl.2005nov <- crop(raster_2005nova, ROI)
+
+chl.2005nov <- raster::extract(r.chl.2005nov, extract.pts, sp = T)
+
+plot(r.chl.2005nov) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2005 dec
+raster_2005dec <- "A20053352005365.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2005deca <- raster(raster_2005dec)
+raster_2005deca
+
+r.chl.2005dec <- crop(raster_2005deca, ROI)
+
+chl.2005dec <- raster::extract(r.chl.2005dec, extract.pts, sp = T)
+
+plot(r.chl.2005dec) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2006 jan
+raster_2006jan <- "A20060012006031.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2006jana <- raster(raster_2006jan)
+raster_2006jana
+
+r.chl.2006jan <- crop(raster_2006jana, ROI)
+
+chl.2006jan <- raster::extract(r.chl.2006jan, extract.pts, sp = T)
+
+plot(r.chl.2006jan) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2006 feb
+raster_2006feb <- "A20060322006059.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2006feba <- raster(raster_2006feb)
+raster_2006feba
+
+r.chl.2006feb <- crop(raster_2006feba, ROI)
+
+chl.2006feb <- raster::extract(r.chl.2006feb, extract.pts, sp = T)
+
+plot(r.chl.2006feb) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2006 mar
+raster_2006mar <- "A20060602006090.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2006mara <- raster(raster_2006mar)
+raster_2006mara
+
+r.chl.2006mar <- crop(raster_2006mara, ROI)
+
+chl.2006mar <- raster::extract(r.chl.2006mar, extract.pts, sp = T)
+
+plot(r.chl.2006mar) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2006 apr
+raster_2006apr <- "A20060912006120.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2006apra <- raster(raster_2006apr)
+raster_2006apra
+
+r.chl.2006apr <- crop(raster_2006apra, ROI)
+
+chl.2006apr <- raster::extract(r.chl.2006apr, extract.pts, sp = T)
+
+plot(r.chl.2006apr) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2006 may
+raster_2006may <- "A20061212006151.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2006maya <- raster(raster_2006may)
+raster_2006maya
+
+r.chl.2006may <- crop(raster_2006maya, ROI)
+
+chl.2006may <- raster::extract(r.chl.2006may, extract.pts, sp = T)
+
+plot(r.chl.2006may) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2006 jun
+raster_2006jun <- "A20061522006181.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2006juna <- raster(raster_2006jun)
+raster_2006juna
+
+r.chl.2006jun <- crop(raster_2006juna, ROI)
+
+chl.2006jun <- raster::extract(r.chl.2006jun, extract.pts, sp = T)
+
+plot(r.chl.2006jun) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2006 jul
+raster_2006jul <- "A20061822006212.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2006jula <- raster(raster_2006jul)
+raster_2006jula
+
+r.chl.2006jul <- crop(raster_2006jula, ROI)
+
+chl.2006jul <- raster::extract(r.chl.2006jul, extract.pts, sp = T)
+
+plot(r.chl.2006jul) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2006 aug
+raster_2006aug <- "A20062132006243.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2006auga <- raster(raster_2006aug)
+raster_2006auga
+
+r.chl.2006aug <- crop(raster_2006auga, ROI)
+
+chl.2006aug <- raster::extract(r.chl.2006aug, extract.pts, sp = T)
+
+plot(r.chl.2006aug) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2006 sep
+raster_2006sep <- "A20062442006273.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2006sepa <- raster(raster_2006sep)
+raster_2006sepa
+
+r.chl.2006sep <- crop(raster_2006sepa, ROI)
+
+chl.2006sep <- raster::extract(r.chl.2006sep, extract.pts, sp = T)
+
+plot(r.chl.2006sep) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2006 oct
+raster_2006oct <- "A20062742006304.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2006octa <- raster(raster_2006oct)
+raster_2006octa
+
+r.chl.2006oct <- crop(raster_2006octa, ROI)
+
+chl.2006oct <- raster::extract(r.chl.2006oct, extract.pts, sp = T)
+
+plot(r.chl.2006oct) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2006 nov
+raster_2006nov <- "A20063052006334.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2006nova <- raster(raster_2006nov)
+raster_2006nova
+
+r.chl.2006nov <- crop(raster_2006nova, ROI)
+
+chl.2006nov <- raster::extract(r.chl.2006nov, extract.pts, sp = T)
+
+plot(r.chl.2006nov) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2006 dec
+raster_2006dec <- "A20063352006365.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2006deca <- raster(raster_2006dec)
+raster_2006deca
+
+r.chl.2006dec <- crop(raster_2006deca, ROI)
+
+chl.2006dec <- raster::extract(r.chl.2006dec, extract.pts, sp = T)
+
+plot(r.chl.2006dec) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2007 jan
+raster_2007jan <- "A20070012007031.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2007jana <- raster(raster_2007jan)
+raster_2007jana
+
+r.chl.2007jan <- crop(raster_2007jana, ROI)
+
+chl.2007jan <- raster::extract(r.chl.2007jan, extract.pts, sp = T)
+
+plot(r.chl.2007jan) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2007 feb
+raster_2007feb <- "A20070322007059.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2007feba <- raster(raster_2007feb)
+raster_2007feba
+
+r.chl.2007feb <- crop(raster_2007feba, ROI)
+
+chl.2007feb <- raster::extract(r.chl.2007feb, extract.pts, sp = T)
+
+plot(r.chl.2007feb) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2007 mar
+raster_2007mar <- "A20070602007090.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2007mara <- raster(raster_2007mar)
+raster_2007mara
+
+r.chl.2007mar <- crop(raster_2007mara, ROI)
+
+chl.2007mar <- raster::extract(r.chl.2007mar, extract.pts, sp = T)
+
+plot(r.chl.2007mar) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2007 apr
+raster_2007apr <- "A20070912007120.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2007apra <- raster(raster_2007apr)
+raster_2007apra
+
+r.chl.2007apr <- crop(raster_2007apra, ROI)
+
+chl.2007apr <- raster::extract(r.chl.2007apr, extract.pts, sp = T)
+
+plot(r.chl.2007apr) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2007 may
+raster_2007may <- "A20071212007151.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2007maya <- raster(raster_2007may)
+raster_2007maya
+
+r.chl.2007may <- crop(raster_2007maya, ROI)
+
+chl.2007may <- raster::extract(r.chl.2007may, extract.pts, sp = T)
+
+plot(r.chl.2007may) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2007 jun
+raster_2007jun <- "A20071522007181.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2007juna <- raster(raster_2007jun)
+raster_2007juna
+
+r.chl.2007jun <- crop(raster_2007juna, ROI)
+
+chl.2007jun <- raster::extract(r.chl.2007jun, extract.pts, sp = T)
+
+plot(r.chl.2007jun) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2007 jul
+raster_2007jul <- "A20071822007212.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2007jula <- raster(raster_2007jul)
+raster_2007jula
+
+r.chl.2007jul <- crop(raster_2007jula, ROI)
+
+chl.2007jul <- raster::extract(r.chl.2007jul, extract.pts, sp = T)
+
+plot(r.chl.2007jul) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2007 aug
+raster_2007aug <- "A20072132007243.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2007auga <- raster(raster_2007aug)
+raster_2007auga
+
+r.chl.2007aug <- crop(raster_2007auga, ROI)
+
+chl.2007aug <- raster::extract(r.chl.2007aug, extract.pts, sp = T)
+
+plot(r.chl.2007aug) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2007 sep
+raster_2007sep <- "A20072442007273.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2007sepa <- raster(raster_2007sep)
+raster_2007sepa
+
+r.chl.2007sep <- crop(raster_2007sepa, ROI)
+
+chl.2007sep <- raster::extract(r.chl.2007sep, extract.pts, sp = T)
+
+plot(r.chl.2007sep) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2007 oct
+raster_2007oct <- "A20072742007304.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2007octa <- raster(raster_2007oct)
+raster_2007octa
+
+r.chl.2007oct <- crop(raster_2007octa, ROI)
+
+chl.2007oct <- raster::extract(r.chl.2007oct, extract.pts, sp = T)
+
+plot(r.chl.2007oct) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2007 nov
+raster_2007nov <- "A20073052007334.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2007nova <- raster(raster_2007nov)
+raster_2007nova
+
+r.chl.2007nov <- crop(raster_2007nova, ROI)
+
+chl.2007nov <- raster::extract(r.chl.2007nov, extract.pts, sp = T)
+
+plot(r.chl.2007nov) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2007 dec
+raster_2007dec <- "A20073352007365.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2007deca <- raster(raster_2007dec)
+raster_2007deca
+
+r.chl.2007dec <- crop(raster_2007deca, ROI)
+
+chl.2007dec <- raster::extract(r.chl.2007dec, extract.pts, sp = T)
+
+plot(r.chl.2007dec) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2008 jan
+raster_2008jan <- "A20080012008031.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2008jana <- raster(raster_2008jan)
+raster_2008jana
+
+r.chl.2008jan <- crop(raster_2008jana, ROI)
+
+chl.2008jan <- raster::extract(r.chl.2008jan, extract.pts, sp = T)
+
+plot(r.chl.2008jan) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2008 feb
+raster_2008feb <- "A20080322008060.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2008feba <- raster(raster_2008feb)
+raster_2008feba
+
+r.chl.2008feb <- crop(raster_2008feba, ROI)
+
+chl.2008feb <- raster::extract(r.chl.2008feb, extract.pts, sp = T)
+
+plot(r.chl.2008feb) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2008 mar
+raster_2008mar <- "A20080612008091.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2008mara <- raster(raster_2008mar)
+raster_2008mara
+
+r.chl.2008mar <- crop(raster_2008mara, ROI)
+
+chl.2008mar <- raster::extract(r.chl.2008mar, extract.pts, sp = T)
+
+plot(r.chl.2008mar) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2008 apr
+raster_2008apr <- "A20080922008121.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2008apra <- raster(raster_2008apr)
+raster_2008apra
+
+r.chl.2008apr <- crop(raster_2008apra, ROI)
+
+chl.2008apr <- raster::extract(r.chl.2008apr, extract.pts, sp = T)
+
+plot(r.chl.2008apr) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2008 may
+raster_2008may <- "A20081222008152.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2008maya <- raster(raster_2008may)
+raster_2008maya
+
+r.chl.2008may <- crop(raster_2008maya, ROI)
+
+chl.2008may <- raster::extract(r.chl.2008may, extract.pts, sp = T)
+
+plot(r.chl.2008may) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2008 jun
+raster_2008jun <- "A20081532008182.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2008juna <- raster(raster_2008jun)
+raster_2008juna
+
+r.chl.2008jun <- crop(raster_2008juna, ROI)
+
+chl.2008jun <- raster::extract(r.chl.2008jun, extract.pts, sp = T)
+
+plot(r.chl.2008jun) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2008 jul
+raster_2008jul <- "A20081832008213.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2008jula <- raster(raster_2008jul)
+raster_2008jula
+
+r.chl.2008jul <- crop(raster_2008jula, ROI)
+
+chl.2008jul <- raster::extract(r.chl.2008jul, extract.pts, sp = T)
+
+plot(r.chl.2008jul) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2008 aug
+raster_2008aug <- "A20082142008244.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2008auga <- raster(raster_2008aug)
+raster_2008auga
+
+r.chl.2008aug <- crop(raster_2008auga, ROI)
+
+chl.2008aug <- raster::extract(r.chl.2008aug, extract.pts, sp = T)
+
+plot(r.chl.2008aug) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2008 sep
+raster_2008sep <- "A20082452008274.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2008sepa <- raster(raster_2008sep)
+raster_2008sepa
+
+r.chl.2008sep <- crop(raster_2008sepa, ROI)
+
+chl.2008sep <- raster::extract(r.chl.2008sep, extract.pts, sp = T)
+
+plot(r.chl.2008sep) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2008 oct
+raster_2008oct <- "A20082752008305.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2008octa <- raster(raster_2008oct)
+raster_2008octa
+
+r.chl.2008oct <- crop(raster_2008octa, ROI)
+
+chl.2008oct <- raster::extract(r.chl.2008oct, extract.pts, sp = T)
+
+plot(r.chl.2008oct) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2008 nov
+raster_2008nov <- "A20083062008335.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2008nova <- raster(raster_2008nov)
+raster_2008nova
+
+r.chl.2008nov <- crop(raster_2008nova, ROI)
+
+chl.2008nov <- raster::extract(r.chl.2008nov, extract.pts, sp = T)
+
+plot(r.chl.2008nov) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2008 dec
+raster_2008dec <- "A20083362008366.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2008deca <- raster(raster_2008dec)
+raster_2008deca
+
+r.chl.2008dec <- crop(raster_2008deca, ROI)
+
+chl.2008dec <- raster::extract(r.chl.2008dec, extract.pts, sp = T)
+
+plot(r.chl.2008dec) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2009 jan
+raster_2009jan <- "A20090012009031.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2009jana <- raster(raster_2009jan)
+raster_2009jana
+
+r.chl.2009jan <- crop(raster_2009jana, ROI)
+
+chl.2009jan <- raster::extract(r.chl.2009jan, extract.pts, sp = T)
+
+plot(r.chl.2009jan) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2009 feb
+raster_2009feb <- "A20090322009059.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2009feba <- raster(raster_2009feb)
+raster_2009feba
+
+r.chl.2009feb <- crop(raster_2009feba, ROI)
+
+chl.2009feb <- raster::extract(r.chl.2009feb, extract.pts, sp = T)
+
+plot(r.chl.2009feb) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2009 mar
+raster_2009mar <- "A20090602009090.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2009mara <- raster(raster_2009mar)
+raster_2009mara
+
+r.chl.2009mar <- crop(raster_2009mara, ROI)
+
+chl.2009mar <- raster::extract(r.chl.2009mar, extract.pts, sp = T)
+
+plot(r.chl.2009mar) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2009 apr
+raster_2009apr <- "A20090912009120.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2009apra <- raster(raster_2009apr)
+raster_2009apra
+
+r.chl.2009apr <- crop(raster_2009apra, ROI)
+
+chl.2009apr <- raster::extract(r.chl.2009apr, extract.pts, sp = T)
+
+plot(r.chl.2009apr) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2009 may
+raster_2009may <- "A20091212009151.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2009maya <- raster(raster_2009may)
+raster_2009maya
+
+r.chl.2009may <- crop(raster_2009maya, ROI)
+
+chl.2009may <- raster::extract(r.chl.2009may, extract.pts, sp = T)
+
+plot(r.chl.2009may) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2009 jun
+raster_2009jun <- "A20091522009181.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2009juna <- raster(raster_2009jun)
+raster_2009juna
+
+r.chl.2009jun <- crop(raster_2009juna, ROI)
+
+chl.2009jun <- raster::extract(r.chl.2009jun, extract.pts, sp = T)
+
+plot(r.chl.2009jun) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2009 jul
+raster_2009jul <- "A20091822009212.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2009jula <- raster(raster_2009jul)
+raster_2009jula
+
+r.chl.2009jul <- crop(raster_2009jula, ROI)
+
+chl.2009jul <- raster::extract(r.chl.2009jul, extract.pts, sp = T)
+
+plot(r.chl.2009jul) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2009 aug
+raster_2009aug <- "A20092132009243.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2009auga <- raster(raster_2009aug)
+raster_2009auga
+
+r.chl.2009aug <- crop(raster_2009auga, ROI)
+
+chl.2009aug <- raster::extract(r.chl.2009aug, extract.pts, sp = T)
+
+plot(r.chl.2009aug) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2009 sep
+raster_2009sep <- "A20092442009273.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2009sepa <- raster(raster_2009sep)
+raster_2009sepa
+
+r.chl.2009sep <- crop(raster_2009sepa, ROI)
+
+chl.2009sep <- raster::extract(r.chl.2009sep, extract.pts, sp = T)
+
+plot(r.chl.2009sep) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2009 oct
+raster_2009oct <- "A20092742009304.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2009octa <- raster(raster_2009oct)
+raster_2009octa
+
+r.chl.2009oct <- crop(raster_2009octa, ROI)
+
+chl.2009oct <- raster::extract(r.chl.2009oct, extract.pts, sp = T)
+
+plot(r.chl.2009oct) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2009 nov
+raster_2009nov <- "A20093052009334.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2009nova <- raster(raster_2009nov)
+raster_2009nova
+
+r.chl.2009nov <- crop(raster_2009nova, ROI)
+
+chl.2009nov <- raster::extract(r.chl.2009nov, extract.pts, sp = T)
+
+plot(r.chl.2009nov) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2009 dec
+raster_2009dec <- "A20093352009365.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2009deca <- raster(raster_2009dec)
+raster_2009deca
+
+r.chl.2009dec <- crop(raster_2009deca, ROI)
+
+chl.2009dec <- raster::extract(r.chl.2009dec, extract.pts, sp = T)
+
+plot(r.chl.2009dec) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2010 jan
+raster_2010jan <- "A20100012010031.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2010jana <- raster(raster_2010jan)
+raster_2010jana
+
+r.chl.2010jan <- crop(raster_2010jana, ROI)
+
+chl.2010jan <- raster::extract(r.chl.2010jan, extract.pts, sp = T)
+
+plot(r.chl.2010jan) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2010 feb
+raster_2010feb <- "A20100322010059.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2010feba <- raster(raster_2010feb)
+raster_2010feba
+
+r.chl.2010feb <- crop(raster_2010feba, ROI)
+
+chl.2010feb <- raster::extract(r.chl.2010feb, extract.pts, sp = T)
+
+plot(r.chl.2010feb) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2010 mar
+raster_2010mar <- "A20100602010090.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2010mara <- raster(raster_2010mar)
+raster_2010mara
+
+r.chl.2010mar <- crop(raster_2010mara, ROI)
+
+chl.2010mar <- raster::extract(r.chl.2010mar, extract.pts, sp = T)
+
+plot(r.chl.2010mar) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2010 apr
+raster_2010apr <- "A20100912010120.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2010apra <- raster(raster_2010apr)
+raster_2010apra
+
+r.chl.2010apr <- crop(raster_2010apra, ROI)
+
+chl.2010apr <- raster::extract(r.chl.2010apr, extract.pts, sp = T)
+
+plot(r.chl.2010apr) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2010 may
+raster_2010may <- "A20101212010151.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2010maya <- raster(raster_2010may)
+raster_2010maya
+
+r.chl.2010may <- crop(raster_2010maya, ROI)
+
+chl.2010may <- raster::extract(r.chl.2010may, extract.pts, sp = T)
+
+plot(r.chl.2010may) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2010 jun
+raster_2010jun <- "A20101522010181.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2010juna <- raster(raster_2010jun)
+raster_2010juna
+
+r.chl.2010jun <- crop(raster_2010juna, ROI)
+
+chl.2010jun <- raster::extract(r.chl.2010jun, extract.pts, sp = T)
+
+plot(r.chl.2010jun) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2010 jul
+raster_2010jul <- "A20101822010212.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2010jula <- raster(raster_2010jul)
+raster_2010jula
+
+r.chl.2010jul <- crop(raster_2010jula, ROI)
+
+chl.2010jul <- raster::extract(r.chl.2010jul, extract.pts, sp = T)
+
+plot(r.chl.2010jul) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2010 aug
+raster_2010aug <- "A20102132010243.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2010auga <- raster(raster_2010aug)
+raster_2010auga
+
+r.chl.2010aug <- crop(raster_2010auga, ROI)
+
+chl.2010aug <- raster::extract(r.chl.2010aug, extract.pts, sp = T)
+
+plot(r.chl.2010aug) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2010 sep
+raster_2010sep <- "A20102442010273.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2010sepa <- raster(raster_2010sep)
+raster_2010sepa
+
+r.chl.2010sep <- crop(raster_2010sepa, ROI)
+
+chl.2010sep <- raster::extract(r.chl.2010sep, extract.pts, sp = T)
+
+plot(r.chl.2010sep) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2010 oct
+raster_2010oct <- "A20102742010304.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2010octa <- raster(raster_2010oct)
+raster_2010octa
+
+r.chl.2010oct <- crop(raster_2010octa, ROI)
+
+chl.2010oct <- raster::extract(r.chl.2010oct, extract.pts, sp = T)
+
+plot(r.chl.2010oct) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2010 nov
+raster_2010nov <- "A20103052010334.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2010nova <- raster(raster_2010nov)
+raster_2010nova
+
+r.chl.2010nov <- crop(raster_2010nova, ROI)
+
+chl.2010nov <- raster::extract(r.chl.2010nov, extract.pts, sp = T)
+
+plot(r.chl.2010nov) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2010 dec
+raster_2010dec <- "A20103352010365.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2010deca <- raster(raster_2010dec)
+raster_2010deca
+
+r.chl.2010dec <- crop(raster_2010deca, ROI)
+
+chl.2010dec <- raster::extract(r.chl.2010dec, extract.pts, sp = T)
+
+plot(r.chl.2010dec) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2011 jan
+raster_2011jan <- "A20110012011031.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2011jana <- raster(raster_2011jan)
+raster_2011jana
+
+r.chl.2011jan <- crop(raster_2011jana, ROI)
+
+chl.2011jan <- raster::extract(r.chl.2011jan, extract.pts, sp = T)
+
+plot(r.chl.2011jan) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2011 feb
+raster_2011feb <- "A20110322011059.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2011feba <- raster(raster_2011feb)
+raster_2011feba
+
+r.chl.2011feb <- crop(raster_2011feba, ROI)
+
+chl.2011feb <- raster::extract(r.chl.2011feb, extract.pts, sp = T)
+
+plot(r.chl.2011feb) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2011 mar
+raster_2011mar <- "A20110602011090.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2011mara <- raster(raster_2011mar)
+raster_2011mara
+
+r.chl.2011mar <- crop(raster_2011mara, ROI)
+
+chl.2011mar <- raster::extract(r.chl.2011mar, extract.pts, sp = T)
+
+plot(r.chl.2011mar) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2011 apr
+raster_2011apr <- "A20110912011120.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2011apra <- raster(raster_2011apr)
+raster_2011apra
+
+r.chl.2011apr <- crop(raster_2011apra, ROI)
+
+chl.2011apr <- raster::extract(r.chl.2011apr, extract.pts, sp = T)
+
+plot(r.chl.2011apr) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2011 may
+raster_2011may <- "A20111212011151.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2011maya <- raster(raster_2011may)
+raster_2011maya
+
+r.chl.2011may <- crop(raster_2011maya, ROI)
+
+chl.2011may <- raster::extract(r.chl.2011may, extract.pts, sp = T)
+
+plot(r.chl.2011may) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2011 jun
+raster_2011jun <- "A20111522011181.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2011juna <- raster(raster_2011jun)
+raster_2011juna
+
+r.chl.2011jun <- crop(raster_2011juna, ROI)
+
+chl.2011jun <- raster::extract(r.chl.2011jun, extract.pts, sp = T)
+
+plot(r.chl.2011jun) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2011 jul
+raster_2011jul <- "A20111822011212.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2011jula <- raster(raster_2011jul)
+raster_2011jula
+
+r.chl.2011jul <- crop(raster_2011jula, ROI)
+
+chl.2011jul <- raster::extract(r.chl.2011jul, extract.pts, sp = T)
+
+plot(r.chl.2011jul) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2011 aug
+raster_2011aug <- "A20112132011243.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2011auga <- raster(raster_2011aug)
+raster_2011auga
+
+r.chl.2011aug <- crop(raster_2011auga, ROI)
+
+chl.2011aug <- raster::extract(r.chl.2011aug, extract.pts, sp = T)
+
+plot(r.chl.2011aug) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2011 sep
+raster_2011sep <- "A20112442011273.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2011sepa <- raster(raster_2011sep)
+raster_2011sepa
+
+r.chl.2011sep <- crop(raster_2011sepa, ROI)
+
+chl.2011sep <- raster::extract(r.chl.2011sep, extract.pts, sp = T)
+
+plot(r.chl.2011sep) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2011 oct
+raster_2011oct <- "A20112742011304.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2011octa <- raster(raster_2011oct)
+raster_2011octa
+
+r.chl.2011oct <- crop(raster_2011octa, ROI)
+
+chl.2011oct <- raster::extract(r.chl.2011oct, extract.pts, sp = T)
+
+plot(r.chl.2011oct) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2011 nov
+raster_2011nov <- "A20113052011334.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2011nova <- raster(raster_2011nov)
+raster_2011nova
+
+r.chl.2011nov <- crop(raster_2011nova, ROI)
+
+chl.2011nov <- raster::extract(r.chl.2011nov, extract.pts, sp = T)
+
+plot(r.chl.2011nov) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2011 dec
+raster_2011dec <- "A20113352011365.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2011deca <- raster(raster_2011dec)
+raster_2011deca
+
+r.chl.2011dec <- crop(raster_2011deca, ROI)
+
+chl.2011dec <- raster::extract(r.chl.2011dec, extract.pts, sp = T)
+
+plot(r.chl.2011dec) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2012 jan
+raster_2012jan <- "A20120012012031.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2012jana <- raster(raster_2012jan)
+raster_2012jana
+
+r.chl.2012jan <- crop(raster_2012jana, ROI)
+
+chl.2012jan <- raster::extract(r.chl.2012jan, extract.pts, sp = T)
+
+plot(r.chl.2012jan) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2012 feb
+raster_2012feb <- "A20120322012060.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2012feba <- raster(raster_2012feb)
+raster_2012feba
+
+r.chl.2012feb <- crop(raster_2012feba, ROI)
+
+chl.2012feb <- raster::extract(r.chl.2012feb, extract.pts, sp = T)
+
+plot(r.chl.2012feb) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2012 mar
+raster_2012mar <- "A20120612012091.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2012mara <- raster(raster_2012mar)
+raster_2012mara
+
+r.chl.2012mar <- crop(raster_2012mara, ROI)
+
+chl.2012mar <- raster::extract(r.chl.2012mar, extract.pts, sp = T)
+
+plot(r.chl.2012mar) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2012 apr
+raster_2012apr <- "A20120922012121.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2012apra <- raster(raster_2012apr)
+raster_2012apra
+
+r.chl.2012apr <- crop(raster_2012apra, ROI)
+
+chl.2012apr <- raster::extract(r.chl.2012apr, extract.pts, sp = T)
+
+plot(r.chl.2012apr) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2012 may
+raster_2012may <- "A20121222012152.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2012maya <- raster(raster_2012may)
+raster_2012maya
+
+r.chl.2012may <- crop(raster_2012maya, ROI)
+
+chl.2012may <- raster::extract(r.chl.2012may, extract.pts, sp = T)
+
+plot(r.chl.2012may) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2012 jun
+raster_2012jun <- "A20121532012182.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2012juna <- raster(raster_2012jun)
+raster_2012juna
+
+r.chl.2012jun <- crop(raster_2012juna, ROI)
+
+chl.2012jun <- raster::extract(r.chl.2012jun, extract.pts, sp = T)
+
+plot(r.chl.2012jun) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2012 jul
+raster_2012jul <- "A20121832012213.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2012jula <- raster(raster_2012jul)
+raster_2012jula
+
+r.chl.2012jul <- crop(raster_2012jula, ROI)
+
+chl.2012jul <- raster::extract(r.chl.2012jul, extract.pts, sp = T)
+
+plot(r.chl.2012jul) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2012 aug
+raster_2012aug <- "A20122142012244.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2012auga <- raster(raster_2012aug)
+raster_2012auga
+
+r.chl.2012aug <- crop(raster_2012auga, ROI)
+
+chl.2012aug <- raster::extract(r.chl.2012aug, extract.pts, sp = T)
+
+plot(r.chl.2012aug) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2012 sep
+raster_2012sep <- "A20122452012274.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2012sepa <- raster(raster_2012sep)
+raster_2012sepa
+
+r.chl.2012sep <- crop(raster_2012sepa, ROI)
+
+chl.2012sep <- raster::extract(r.chl.2012sep, extract.pts, sp = T)
+
+plot(r.chl.2012sep) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2012 oct
+raster_2012oct <- "A20122752012305.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2012octa <- raster(raster_2012oct)
+raster_2012octa
+
+r.chl.2012oct <- crop(raster_2012octa, ROI)
+
+chl.2012oct <- raster::extract(r.chl.2012oct, extract.pts, sp = T)
+
+plot(r.chl.2012oct) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2012 nov
+raster_2012nov <- "A20123062012335.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2012nova <- raster(raster_2012nov)
+raster_2012nova
+
+r.chl.2012nov <- crop(raster_2012nova, ROI)
+
+chl.2012nov <- raster::extract(r.chl.2012nov, extract.pts, sp = T)
+
+plot(r.chl.2012nov) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2012 dec
+raster_2012dec <- "A20123362012366.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2012deca <- raster(raster_2012dec)
+raster_2012deca
+
+r.chl.2012dec <- crop(raster_2012deca, ROI)
+
+chl.2012dec <- raster::extract(r.chl.2012dec, extract.pts, sp = T)
+
+plot(r.chl.2012dec) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2013 jan
+raster_2013jan <- "A20130012013031.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2013jana <- raster(raster_2013jan)
+raster_2013jana
+
+r.chl.2013jan <- crop(raster_2013jana, ROI)
+
+chl.2013jan <- raster::extract(r.chl.2013jan, extract.pts, sp = T)
+
+plot(r.chl.2013jan) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2013 feb
+raster_2013feb <- "A20130322013059.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2013feba <- raster(raster_2013feb)
+raster_2013feba
+
+r.chl.2013feb <- crop(raster_2013feba, ROI)
+
+chl.2013feb <- raster::extract(r.chl.2013feb, extract.pts, sp = T)
+
+plot(r.chl.2013feb) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2013 mar
+raster_2013mar <- "A20130602013090.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2013mara <- raster(raster_2013mar)
+raster_2013mara
+
+r.chl.2013mar <- crop(raster_2013mara, ROI)
+
+chl.2013mar <- raster::extract(r.chl.2013mar, extract.pts, sp = T)
+
+plot(r.chl.2013mar) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2013 apr
+raster_2013apr <- "A20130912013120.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2013apra <- raster(raster_2013apr)
+raster_2013apra
+
+r.chl.2013apr <- crop(raster_2013apra, ROI)
+
+chl.2013apr <- raster::extract(r.chl.2013apr, extract.pts, sp = T)
+
+plot(r.chl.2013apr) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2013 may
+raster_2013may <- "A20131212013151.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2013maya <- raster(raster_2013may)
+raster_2013maya
+
+r.chl.2013may <- crop(raster_2013maya, ROI)
+
+chl.2013may <- raster::extract(r.chl.2013may, extract.pts, sp = T)
+
+plot(r.chl.2013may) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2013 jun
+raster_2013jun <- "A20131522013181.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2013juna <- raster(raster_2013jun)
+raster_2013juna
+
+r.chl.2013jun <- crop(raster_2013juna, ROI)
+
+chl.2013jun <- raster::extract(r.chl.2013jun, extract.pts, sp = T)
+
+plot(r.chl.2013jun) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2013 jul
+raster_2013jul <- "A20131822013212.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2013jula <- raster(raster_2013jul)
+raster_2013jula
+
+r.chl.2013jul <- crop(raster_2013jula, ROI)
+
+chl.2013jul <- raster::extract(r.chl.2013jul, extract.pts, sp = T)
+
+plot(r.chl.2013jul) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2013 aug
+raster_2013aug <- "A20132132013243.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2013auga <- raster(raster_2013aug)
+raster_2013auga
+
+r.chl.2013aug <- crop(raster_2013auga, ROI)
+
+chl.2013aug <- raster::extract(r.chl.2013aug, extract.pts, sp = T)
+
+plot(r.chl.2013aug) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2013 sep
+raster_2013sep <- "A20132442013273.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2013sepa <- raster(raster_2013sep)
+raster_2013sepa
+
+r.chl.2013sep <- crop(raster_2013sepa, ROI)
+
+chl.2013sep <- raster::extract(r.chl.2013sep, extract.pts, sp = T)
+
+plot(r.chl.2013sep) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2013 oct
+raster_2013oct <- "A20132742013304.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2013octa <- raster(raster_2013oct)
+raster_2013octa
+
+r.chl.2013oct <- crop(raster_2013octa, ROI)
+
+chl.2013oct <- raster::extract(r.chl.2013oct, extract.pts, sp = T)
+
+plot(r.chl.2013oct) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2013 nov
+raster_2013nov <- "A20133052013334.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2013nova <- raster(raster_2013nov)
+raster_2013nova
+
+r.chl.2013nov <- crop(raster_2013nova, ROI)
+
+chl.2013nov <- raster::extract(r.chl.2013nov, extract.pts, sp = T)
+
+plot(r.chl.2013nov) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2013 dec
+raster_2013dec <- "A20133352013365.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2013deca <- raster(raster_2013dec)
+raster_2013deca
+
+r.chl.2013dec <- crop(raster_2013deca, ROI)
+
+chl.2013dec <- raster::extract(r.chl.2013dec, extract.pts, sp = T)
+
+plot(r.chl.2013dec) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2014 jan
+raster_2014jan <- "A20140012014031.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2014jana <- raster(raster_2014jan)
+raster_2014jana
+
+r.chl.2014jan <- crop(raster_2014jana, ROI)
+
+chl.2014jan <- raster::extract(r.chl.2014jan, extract.pts, sp = T)
+
+plot(r.chl.2014jan) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2014 feb
+raster_2014feb <- "A20140322014059.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2014feba <- raster(raster_2014feb)
+raster_2014feba
+
+r.chl.2014feb <- crop(raster_2014feba, ROI)
+
+chl.2014feb <- raster::extract(r.chl.2014feb, extract.pts, sp = T)
+
+plot(r.chl.2014feb) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2014 mar
+raster_2014mar <- "A20140602014090.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2014mara <- raster(raster_2014mar)
+raster_2014mara
+
+r.chl.2014mar <- crop(raster_2014mara, ROI)
+
+chl.2014mar <- raster::extract(r.chl.2014mar, extract.pts, sp = T)
+
+plot(r.chl.2014mar) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2014 apr
+raster_2014apr <- "A20140912014120.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2014apra <- raster(raster_2014apr)
+raster_2014apra
+
+r.chl.2014apr <- crop(raster_2014apra, ROI)
+
+chl.2014apr <- raster::extract(r.chl.2014apr, extract.pts, sp = T)
+
+plot(r.chl.2014apr) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2014 may
+raster_2014may <- "A20141212014151.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2014maya <- raster(raster_2014may)
+raster_2014maya
+
+r.chl.2014may <- crop(raster_2014maya, ROI)
+
+chl.2014may <- raster::extract(r.chl.2014may, extract.pts, sp = T)
+
+plot(r.chl.2014may) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2014 jun
+raster_2014jun <- "A20141522014181.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2014juna <- raster(raster_2014jun)
+raster_2014juna
+
+r.chl.2014jun <- crop(raster_2014juna, ROI)
+
+chl.2014jun <- raster::extract(r.chl.2014jun, extract.pts, sp = T)
+
+plot(r.chl.2014jun) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2014 jul
+raster_2014jul <- "A20141822014212.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2014jula <- raster(raster_2014jul)
+raster_2014jula
+
+r.chl.2014jul <- crop(raster_2014jula, ROI)
+
+chl.2014jul <- raster::extract(r.chl.2014jul, extract.pts, sp = T)
+
+plot(r.chl.2014jul) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2014 aug
+raster_2014aug <- "A20142132014243.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2014auga <- raster(raster_2014aug)
+raster_2014auga
+
+r.chl.2014aug <- crop(raster_2014auga, ROI)
+
+chl.2014aug <- raster::extract(r.chl.2014aug, extract.pts, sp = T)
+
+plot(r.chl.2014aug) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2014 sep
+raster_2014sep <- "A20142442014273.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2014sepa <- raster(raster_2014sep)
+raster_2014sepa
+
+r.chl.2014sep <- crop(raster_2014sepa, ROI)
+
+chl.2014sep <- raster::extract(r.chl.2014sep, extract.pts, sp = T)
+
+plot(r.chl.2014sep) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2014 oct
+raster_2014oct <- "A20142742014304.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2014octa <- raster(raster_2014oct)
+raster_2014octa
+
+r.chl.2014oct <- crop(raster_2014octa, ROI)
+
+chl.2014oct <- raster::extract(r.chl.2014oct, extract.pts, sp = T)
+
+plot(r.chl.2014oct) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2014 nov
+raster_2014nov <- "A20143052014334.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2014nova <- raster(raster_2014nov)
+raster_2014nova
+
+r.chl.2014nov <- crop(raster_2014nova, ROI)
+
+chl.2014nov <- raster::extract(r.chl.2014nov, extract.pts, sp = T)
+
+plot(r.chl.2014nov) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2014 dec
+raster_2014dec <- "A20143352014365.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2014deca <- raster(raster_2014dec)
+raster_2014deca
+
+r.chl.2014dec <- crop(raster_2014deca, ROI)
+
+chl.2014dec <- raster::extract(r.chl.2014dec, extract.pts, sp = T)
+
+plot(r.chl.2014dec) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2015 jan
+raster_2015jan <- "A20150012015031.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2015jana <- raster(raster_2015jan)
+raster_2015jana
+
+r.chl.2015jan <- crop(raster_2015jana, ROI)
+
+chl.2015jan <- raster::extract(r.chl.2015jan, extract.pts, sp = T)
+
+plot(r.chl.2015jan) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2015 feb
+raster_2015feb <- "A20150322015059.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2015feba <- raster(raster_2015feb)
+raster_2015feba
+
+r.chl.2015feb <- crop(raster_2015feba, ROI)
+
+chl.2015feb <- raster::extract(r.chl.2015feb, extract.pts, sp = T)
+
+plot(r.chl.2015feb) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2015 mar
+raster_2015mar <- "A20150602015090.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2015mara <- raster(raster_2015mar)
+raster_2015mara
+
+r.chl.2015mar <- crop(raster_2015mara, ROI)
+
+chl.2015mar <- raster::extract(r.chl.2015mar, extract.pts, sp = T)
+
+plot(r.chl.2015mar) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2015 apr
+raster_2015apr <- "A20150912015120.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2015apra <- raster(raster_2015apr)
+raster_2015apra
+
+r.chl.2015apr <- crop(raster_2015apra, ROI)
+
+chl.2015apr <- raster::extract(r.chl.2015apr, extract.pts, sp = T)
+
+plot(r.chl.2015apr) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2015 may
+raster_2015may <- "A20151212015151.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2015maya <- raster(raster_2015may)
+raster_2015maya
+
+r.chl.2015may <- crop(raster_2015maya, ROI)
+
+chl.2015may <- raster::extract(r.chl.2015may, extract.pts, sp = T)
+
+plot(r.chl.2015may) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2015 jun
+raster_2015jun <- "A20151522015181.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2015juna <- raster(raster_2015jun)
+raster_2015juna
+
+r.chl.2015jun <- crop(raster_2015juna, ROI)
+
+chl.2015jun <- raster::extract(r.chl.2015jun, extract.pts, sp = T)
+
+plot(r.chl.2015jun) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2015 jul
+raster_2015jul <- "A20151822015212.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2015jula <- raster(raster_2015jul)
+raster_2015jula
+
+r.chl.2015jul <- crop(raster_2015jula, ROI)
+
+chl.2015jul <- raster::extract(r.chl.2015jul, extract.pts, sp = T)
+
+plot(r.chl.2015jul) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2015 aug
+raster_2015aug <- "A20152132015243.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2015auga <- raster(raster_2015aug)
+raster_2015auga
+
+r.chl.2015aug <- crop(raster_2015auga, ROI)
+
+chl.2015aug <- raster::extract(r.chl.2015aug, extract.pts, sp = T)
+
+plot(r.chl.2015aug) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2015 sep
+raster_2015sep <- "A20152442015273.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2015sepa <- raster(raster_2015sep)
+raster_2015sepa
+
+r.chl.2015sep <- crop(raster_2015sepa, ROI)
+
+chl.2015sep <- raster::extract(r.chl.2015sep, extract.pts, sp = T)
+
+plot(r.chl.2015sep) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2015 oct
+raster_2015oct <- "A20152742015304.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2015octa <- raster(raster_2015oct)
+raster_2015octa
+
+r.chl.2015oct <- crop(raster_2015octa, ROI)
+
+chl.2015oct <- raster::extract(r.chl.2015oct, extract.pts, sp = T)
+
+plot(r.chl.2015oct) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2015 nov
+raster_2015nov <- "A20153052015334.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2015nova <- raster(raster_2015nov)
+raster_2015nova
+
+r.chl.2015nov <- crop(raster_2015nova, ROI)
+
+chl.2015nov <- raster::extract(r.chl.2015nov, extract.pts, sp = T)
+
+plot(r.chl.2015nov) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2015 dec
+raster_2015dec <- "A20153352015365.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2015deca <- raster(raster_2015dec)
+raster_2015deca
+
+r.chl.2015dec <- crop(raster_2015deca, ROI)
+
+chl.2015dec <- raster::extract(r.chl.2015dec, extract.pts, sp = T)
+
+plot(r.chl.2015dec) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2016 jan
+raster_2016jan <- "A20160012016031.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2016jana <- raster(raster_2016jan)
+raster_2016jana
+
+r.chl.2016jan <- crop(raster_2016jana, ROI)
+
+chl.2016jan <- raster::extract(r.chl.2016jan, extract.pts, sp = T)
+
+plot(r.chl.2016jan) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2016 feb
+raster_2016feb <- "A20160322016060.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2016feba <- raster(raster_2016feb)
+raster_2016feba
+
+r.chl.2016feb <- crop(raster_2016feba, ROI)
+
+chl.2016feb <- raster::extract(r.chl.2016feb, extract.pts, sp = T)
+
+plot(r.chl.2016feb) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2016 mar
+raster_2016mar <- "A20160612016091.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2016mara <- raster(raster_2016mar)
+raster_2016mara
+
+r.chl.2016mar <- crop(raster_2016mara, ROI)
+
+chl.2016mar <- raster::extract(r.chl.2016mar, extract.pts, sp = T)
+
+plot(r.chl.2016mar) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2016 apr
+raster_2016apr <- "A20160922016121.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2016apra <- raster(raster_2016apr)
+raster_2016apra
+
+r.chl.2016apr <- crop(raster_2016apra, ROI)
+
+chl.2016apr <- raster::extract(r.chl.2016apr, extract.pts, sp = T)
+
+plot(r.chl.2016apr) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2016 may
+raster_2016may <- "A20161222016152.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2016maya <- raster(raster_2016may)
+raster_2016maya
+
+r.chl.2016may <- crop(raster_2016maya, ROI)
+
+chl.2016may <- raster::extract(r.chl.2016may, extract.pts, sp = T)
+
+plot(r.chl.2016may) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2016 jun
+raster_2016jun <- "A20161532016182.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2016juna <- raster(raster_2016jun)
+raster_2016juna
+
+r.chl.2016jun <- crop(raster_2016juna, ROI)
+
+chl.2016jun <- raster::extract(r.chl.2016jun, extract.pts, sp = T)
+
+plot(r.chl.2016jun) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2016 jul
+raster_2016jul <- "A20161832016213.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2016jula <- raster(raster_2016jul)
+raster_2016jula
+
+r.chl.2016jul <- crop(raster_2016jula, ROI)
+
+chl.2016jul <- raster::extract(r.chl.2016jul, extract.pts, sp = T)
+
+plot(r.chl.2016jul) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2016 aug
+raster_2016aug <- "A20162142016244.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2016auga <- raster(raster_2016aug)
+raster_2016auga
+
+r.chl.2016aug <- crop(raster_2016auga, ROI)
+
+chl.2016aug <- raster::extract(r.chl.2016aug, extract.pts, sp = T)
+
+plot(r.chl.2016aug) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2016 sep
+raster_2016sep <- "A20162452016274.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2016sepa <- raster(raster_2016sep)
+raster_2016sepa
+
+r.chl.2016sep <- crop(raster_2016sepa, ROI)
+
+chl.2016sep <- raster::extract(r.chl.2016sep, extract.pts, sp = T)
+
+plot(r.chl.2016sep) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2016 oct
+raster_2016oct <- "A20162752016305.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2016octa <- raster(raster_2016oct)
+raster_2016octa
+
+r.chl.2016oct <- crop(raster_2016octa, ROI)
+
+chl.2016oct <- raster::extract(r.chl.2016oct, extract.pts, sp = T)
+
+plot(r.chl.2016oct) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2016 nov
+raster_2016nov <- "A20163062016335.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2016nova <- raster(raster_2016nov)
+raster_2016nova
+
+r.chl.2016nov <- crop(raster_2016nova, ROI)
+
+chl.2016nov <- raster::extract(r.chl.2016nov, extract.pts, sp = T)
+
+plot(r.chl.2016nov) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2016 dec
+raster_2016dec <- "A20163362016366.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2016deca <- raster(raster_2016dec)
+raster_2016deca
+
+r.chl.2016dec <- crop(raster_2016deca, ROI)
+
+chl.2016dec <- raster::extract(r.chl.2016dec, extract.pts, sp = T)
+
+plot(r.chl.2016dec) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2017 jan
+raster_2017jan <- "A20170012017031.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2017jana <- raster(raster_2017jan)
+raster_2017jana
+
+r.chl.2017jan <- crop(raster_2017jana, ROI)
+
+chl.2017jan <- raster::extract(r.chl.2017jan, extract.pts, sp = T)
+
+plot(r.chl.2017jan) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2017 feb
+raster_2017feb <- "A20170322017059.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2017feba <- raster(raster_2017feb)
+raster_2017feba
+
+r.chl.2017feb <- crop(raster_2017feba, ROI)
+
+chl.2017feb <- raster::extract(r.chl.2017feb, extract.pts, sp = T)
+
+plot(r.chl.2017feb) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2017 mar
+raster_2017mar <- "A20170602017090.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2017mara <- raster(raster_2017mar)
+raster_2017mara
+
+r.chl.2017mar <- crop(raster_2017mara, ROI)
+
+chl.2017mar <- raster::extract(r.chl.2017mar, extract.pts, sp = T)
+
+plot(r.chl.2017mar) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2017 apr
+raster_2017apr <- "A20170912017120.L3m_MO_CHL_chlor_a_4km.nc "
+raster_2017apra <- raster(raster_2017apr)
+raster_2017apra
+
+r.chl.2017apr <- crop(raster_2017apra, ROI)
+
+chl.2017apr <- raster::extract(r.chl.2017apr, extract.pts, sp = T)
+
+plot(r.chl.2017apr) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2017 may
+raster_2017may <- "A20171212017151.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2017maya <- raster(raster_2017may)
+raster_2017maya
+
+r.chl.2017may <- crop(raster_2017maya, ROI)
+
+chl.2017may <- raster::extract(r.chl.2017may, extract.pts, sp = T)
+
+plot(r.chl.2017may) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2017 jun
+raster_2017jun <- "A20171522017181.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2017juna <- raster(raster_2017jun)
+raster_2017juna
+
+r.chl.2017jun <- crop(raster_2017juna, ROI)
+
+chl.2017jun <- raster::extract(r.chl.2017jun, extract.pts, sp = T)
+
+plot(r.chl.2017jun) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2017 jul
+raster_2017jul <- "A20171822017212.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2017jula <- raster(raster_2017jul)
+raster_2017jula
+
+r.chl.2017jul <- crop(raster_2017jula, ROI)
+
+chl.2017jul <- raster::extract(r.chl.2017jul, extract.pts, sp = T)
+
+plot(r.chl.2017jul) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2017 aug
+raster_2017aug <- "A20172132017243.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2017auga <- raster(raster_2017aug)
+raster_2017auga
+
+r.chl.2017aug <- crop(raster_2017auga, ROI)
+
+chl.2017aug <- raster::extract(r.chl.2017aug, extract.pts, sp = T)
+
+plot(r.chl.2017aug) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2017 sep
+raster_2017sep <- "A20172442017273.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2017sepa <- raster(raster_2017sep)
+raster_2017sepa
+
+r.chl.2017sep <- crop(raster_2017sepa, ROI)
+
+chl.2017sep <- raster::extract(r.chl.2017sep, extract.pts, sp = T)
+
+plot(r.chl.2017sep) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2017 oct
+raster_2017oct <- "A20172742017304.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2017octa <- raster(raster_2017oct)
+raster_2017octa
+
+r.chl.2017oct <- crop(raster_2017octa, ROI)
+
+chl.2017oct <- raster::extract(r.chl.2017oct, extract.pts, sp = T)
+
+plot(r.chl.2017oct) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2017 nov
+raster_2017nov <- "A20173052017334.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2017nova <- raster(raster_2017nov)
+raster_2017nova
+
+r.chl.2017nov <- crop(raster_2017nova, ROI)
+
+chl.2017nov <- raster::extract(r.chl.2017nov, extract.pts, sp = T)
+
+plot(r.chl.2017nov) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2017 dec
+raster_2017dec <- "A20173352017365.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2017deca <- raster(raster_2017dec)
+raster_2017deca
+
+r.chl.2017dec <- crop(raster_2017deca, ROI)
+
+chl.2017dec <- raster::extract(r.chl.2017dec, extract.pts, sp = T)
+
+plot(r.chl.2017dec) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2018 jan
+raster_2018jan <- "A20180012018031.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2018jana <- raster(raster_2018jan)
+raster_2018jana
+
+r.chl.2018jan <- crop(raster_2018jana, ROI)
+
+chl.2018jan <- raster::extract(r.chl.2018jan, extract.pts, sp = T)
+
+plot(r.chl.2018jan) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2018 feb
+raster_2018feb <- "A20180322018059.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2018feba <- raster(raster_2018feb)
+raster_2018feba
+
+r.chl.2018feb <- crop(raster_2018feba, ROI)
+
+chl.2018feb <- raster::extract(r.chl.2018feb, extract.pts, sp = T)
+
+plot(r.chl.2018feb) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2018 mar
+raster_2018mar <- "A20180602018090.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2018mara <- raster(raster_2018mar)
+raster_2018mara
+
+r.chl.2018mar <- crop(raster_2018mara, ROI)
+
+chl.2018mar <- raster::extract(r.chl.2018mar, extract.pts, sp = T)
+
+plot(r.chl.2018mar) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2018 apr
+raster_2018apr <- "A20180912018120.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2018apra <- raster(raster_2018apr)
+raster_2018apra
+
+r.chl.2018apr <- crop(raster_2018apra, ROI)
+
+chl.2018apr <- raster::extract(r.chl.2018apr, extract.pts, sp = T)
+
+plot(r.chl.2018apr) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2018 may
+raster_2018may <- "A20181212018151.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2018maya <- raster(raster_2018may)
+raster_2018maya
+
+r.chl.2018may <- crop(raster_2018maya, ROI)
+
+chl.2018may <- raster::extract(r.chl.2018may, extract.pts, sp = T)
+
+plot(r.chl.2018may) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2018 jun
+raster_2018jun <- "A20181522018181.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2018juna <- raster(raster_2018jun)
+raster_2018juna
+
+r.chl.2018jun <- crop(raster_2018juna, ROI)
+
+chl.2018jun <- raster::extract(r.chl.2018jun, extract.pts, sp = T)
+
+plot(r.chl.2018jun) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2018 jul
+raster_2018jul <- "A20181822018212.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2018jula <- raster(raster_2018jul)
+raster_2018jula
+
+r.chl.2018jul <- crop(raster_2018jula, ROI)
+
+chl.2018jul <- raster::extract(r.chl.2018jul, extract.pts, sp = T)
+
+plot(r.chl.2018jul) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2018 aug
+raster_2018aug <- "A20182132018243.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2018auga <- raster(raster_2018aug)
+raster_2018auga
+
+r.chl.2018aug <- crop(raster_2018auga, ROI)
+
+chl.2018aug <- raster::extract(r.chl.2018aug, extract.pts, sp = T)
+
+plot(r.chl.2018aug) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2018 sep
+raster_2018sep <- "A20182442018273.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2018sepa <- raster(raster_2018sep)
+raster_2018sepa
+
+r.chl.2018sep <- crop(raster_2018sepa, ROI)
+
+chl.2018sep <- raster::extract(r.chl.2018sep, extract.pts, sp = T)
+
+plot(r.chl.2018sep) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2018 oct
+raster_2018oct <- "A20182742018304.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2018octa <- raster(raster_2018oct)
+raster_2018octa
+
+r.chl.2018oct <- crop(raster_2018octa, ROI)
+
+chl.2018oct <- raster::extract(r.chl.2018oct, extract.pts, sp = T)
+
+plot(r.chl.2018oct) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2018 nov
+raster_2018nov <- "A20183052018334.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2018nova <- raster(raster_2018nov)
+raster_2018nova
+
+r.chl.2018nov <- crop(raster_2018nova, ROI)
+
+chl.2018nov <- raster::extract(r.chl.2018nov, extract.pts, sp = T)
+
+plot(r.chl.2018nov) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2018 dec
+raster_2018dec <- "A20183352018365.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2018deca <- raster(raster_2018dec)
+raster_2018deca
+
+r.chl.2018dec <- crop(raster_2018deca, ROI)
+
+chl.2018dec <- raster::extract(r.chl.2018dec, extract.pts, sp = T)
+
+plot(r.chl.2018dec) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2019 jan
+raster_2019jan <- "A20190012019031.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2019jana <- raster(raster_2019jan)
+raster_2019jana
+
+r.chl.2019jan <- crop(raster_2019jana, ROI)
+
+chl.2019jan <- raster::extract(r.chl.2019jan, extract.pts, sp = T)
+
+plot(r.chl.2019jan) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2019 feb
+raster_2019feb <- "A20190322019059.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2019feba <- raster(raster_2019feb)
+raster_2019feba
+
+r.chl.2019feb <- crop(raster_2019feba, ROI)
+
+chl.2019feb <- raster::extract(r.chl.2019feb, extract.pts, sp = T)
+
+plot(r.chl.2019feb) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2019 mar
+raster_2019mar <- "A20190602019090.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2019mara <- raster(raster_2019mar)
+raster_2019mara
+
+r.chl.2019mar <- crop(raster_2019mara, ROI)
+
+chl.2019mar <- raster::extract(r.chl.2019mar, extract.pts, sp = T)
+
+plot(r.chl.2019mar) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2019 apr
+raster_2019apr <- "A20190912019120.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2019apra <- raster(raster_2019apr)
+raster_2019apra
+
+r.chl.2019apr <- crop(raster_2019apra, ROI)
+
+chl.2019apr <- raster::extract(r.chl.2019apr, extract.pts, sp = T)
+
+plot(r.chl.2019apr) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2019 may
+raster_2019may <- "A20191212019151.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2019maya <- raster(raster_2019may)
+raster_2019maya
+
+r.chl.2019may <- crop(raster_2019maya, ROI)
+
+chl.2019may <- raster::extract(r.chl.2019may, extract.pts, sp = T)
+
+plot(r.chl.2019may) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2019 jun
+raster_2019jun <- "A20191522019181.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2019juna <- raster(raster_2019jun)
+raster_2019juna
+
+r.chl.2019jun <- crop(raster_2019juna, ROI)
+
+chl.2019jun <- raster::extract(r.chl.2019jun, extract.pts, sp = T)
+
+plot(r.chl.2019jun) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2019 jul
+raster_2019jul <- "A20191822019212.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2019jula <- raster(raster_2019jul)
+raster_2019jula
+
+r.chl.2019jul <- crop(raster_2019jula, ROI)
+
+chl.2019jul <- raster::extract(r.chl.2019jul, extract.pts, sp = T)
+
+plot(r.chl.2019jul) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2019 aug
+raster_2019aug <- "A20192132019243.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2019auga <- raster(raster_2019aug)
+raster_2019auga
+
+r.chl.2019aug <- crop(raster_2019auga, ROI)
+
+chl.2019aug <- raster::extract(r.chl.2019aug, extract.pts, sp = T)
+
+plot(r.chl.2019aug) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2019 sep
+raster_2019sep <- "A20192442019273.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2019sepa <- raster(raster_2019sep)
+raster_2019sepa
+
+r.chl.2019sep <- crop(raster_2019sepa, ROI)
+
+chl.2019sep <- raster::extract(r.chl.2019sep, extract.pts, sp = T)
+
+plot(r.chl.2019sep) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2019 oct
+raster_2019oct <- "A20192742019304.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2019octa <- raster(raster_2019oct)
+raster_2019octa
+
+r.chl.2019oct <- crop(raster_2019octa, ROI)
+
+chl.2019oct <- raster::extract(r.chl.2019oct, extract.pts, sp = T)
+
+plot(r.chl.2019oct) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2019 nov
+raster_2019nov <- "A20193052019334.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2019nova <- raster(raster_2019nov)
+raster_2019nova
+
+r.chl.2019nov <- crop(raster_2019nova, ROI)
+
+chl.2019nov <- raster::extract(r.chl.2019nov, extract.pts, sp = T)
+
+plot(r.chl.2019nov) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2019 dec
+raster_2019dec <- "A20193352019365.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2019deca <- raster(raster_2019dec)
+raster_2019deca
+
+r.chl.2019dec <- crop(raster_2019deca, ROI)
+
+chl.2019dec <- raster::extract(r.chl.2019dec, extract.pts, sp = T)
+
+plot(r.chl.2019dec) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2020 jan
+raster_2020jan <- "A20200012020031.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2020jana <- raster(raster_2020jan)
+raster_2020jana
+
+r.chl.2020jan <- crop(raster_2020jana, ROI)
+
+chl.2020jan <- raster::extract(r.chl.2020jan, extract.pts, sp = T)
+
+plot(r.chl.2020jan) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2020 feb
+raster_2020feb <- "A20200322020060.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2020feba <- raster(raster_2020feb)
+raster_2020feba
+
+r.chl.2020feb <- crop(raster_2020feba, ROI)
+
+chl.2020feb <- raster::extract(r.chl.2020feb, extract.pts, sp = T)
+
+plot(r.chl.2020feb) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2020 mar
+raster_2020mar <- "A20200612020091.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2020mara <- raster(raster_2020mar)
+raster_2020mara
+
+r.chl.2020mar <- crop(raster_2020mara, ROI)
+
+chl.2020mar <- raster::extract(r.chl.2020mar, extract.pts, sp = T)
+
+plot(r.chl.2020mar) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2020 apr
+raster_2020apr <- "A20200922020121.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2020apra <- raster(raster_2020apr)
+raster_2020apra
+
+r.chl.2020apr <- crop(raster_2020apra, ROI)
+
+chl.2020apr <- raster::extract(r.chl.2020apr, extract.pts, sp = T)
+
+plot(r.chl.2020apr) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2020 may
+raster_2020may <- "A20201222020152.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2020maya <- raster(raster_2020may)
+raster_2020maya
+
+r.chl.2020may <- crop(raster_2020maya, ROI)
+
+chl.2020may <- raster::extract(r.chl.2020may, extract.pts, sp = T)
+
+plot(r.chl.2020may) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+```
+
+```{r}
+### 2020 jun
+raster_2020jun <- "A20201532020182.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2020juna <- raster(raster_2020jun)
+raster_2020juna
+
+r.chl.2020jun <- crop(raster_2020juna, ROI)
+
+chl.2020jun <- raster::extract(r.chl.2020jun, extract.pts, sp = T)
+
+plot(r.chl.2020jun) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2020 jul
+raster_2020jul <- "A20201832020213.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2020jula <- raster(raster_2020jul)
+raster_2020jula
+
+r.chl.2020jul <- crop(raster_2020jula, ROI)
+
+chl.2020jul <- raster::extract(r.chl.2020jul, extract.pts, sp = T)
+
+plot(r.chl.2020jul) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2020 aug
+raster_2020aug <- "A20202142020244.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2020auga <- raster(raster_2020aug)
+raster_2020auga
+
+r.chl.2020aug <- crop(raster_2020auga, ROI)
+
+chl.2020aug <- raster::extract(r.chl.2020aug, extract.pts, sp = T)
+
+plot(r.chl.2020aug) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2020 sep
+raster_2020sep <- "A20202452020274.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2020sepa <- raster(raster_2020sep)
+raster_2020sepa
+
+r.chl.2020sep <- crop(raster_2020sepa, ROI)
+
+chl.2020sep <- raster::extract(r.chl.2020sep, extract.pts, sp = T)
+
+plot(r.chl.2020sep) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2020 oct
+raster_2020oct <- "A20202752020305.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2020octa <- raster(raster_2020oct)
+raster_2020octa
+
+r.chl.2020oct <- crop(raster_2020octa, ROI)
+
+chl.2020oct <- raster::extract(r.chl.2020oct, extract.pts, sp = T)
+
+plot(r.chl.2020oct) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2020 nov
+raster_2020nov <- "A20203062020335.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2020nova <- raster(raster_2020nov)
+raster_2020nova
+
+r.chl.2020nov <- crop(raster_2020nova, ROI)
+
+chl.2020nov <- raster::extract(r.chl.2020nov, extract.pts, sp = T)
+
+plot(r.chl.2020nov) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2020 dec
+raster_2020dec <- "A20203362020366.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2020deca <- raster(raster_2020dec)
+raster_2020deca
+
+r.chl.2020dec <- crop(raster_2020deca, ROI)
+
+chl.2020dec <- raster::extract(r.chl.2020dec, extract.pts, sp = T)
+
+plot(r.chl.2020dec) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2021jan
+raster_2021jan <- "A20210012021031.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2021jana <- raster(raster_2021jan)
+raster_2021jana
+
+r.chl.2021jan <- crop(raster_2021jana, ROI)
+
+chl.2021jan <- raster::extract(r.chl.2021jan, extract.pts, sp = T)
+
+plot(r.chl.2021jan) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2021feb
+raster_2021feb <- "A20210322021059.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2021feba <- raster(raster_2021feb)
+raster_2021feba
+
+r.chl.2021feb <- crop(raster_2021feba, ROI)
+
+chl.2021feb <- raster::extract(r.chl.2021feb, extract.pts, sp = T)
+
+plot(r.chl.2021feb) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2021 mar
+raster_2021mar <- "A20210602021090.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2021mara <- raster(raster_2021mar)
+raster_2021mara
+
+r.chl.2021mar <- crop(raster_2021mara, ROI)
+
+chl.2021mar <- raster::extract(r.chl.2021mar, extract.pts, sp = T)
+
+plot(r.chl.2021mar) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2021 apr
+raster_2021apr <- "A20210912021120.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2021apra <- raster(raster_2021apr)
+raster_2021apra
+
+r.chl.2021apr <- crop(raster_2021apra, ROI)
+
+chl.2021apr <- raster::extract(r.chl.2021apr, extract.pts, sp = T)
+
+plot(r.chl.2021apr) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2021 may
+raster_2021may <- "A20211212021151.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2021maya <- raster(raster_2021may)
+raster_2021maya
+
+r.chl.2021may <- crop(raster_2021maya, ROI)
+
+chl.2021may <- raster::extract(r.chl.2021may, extract.pts, sp = T)
+chl.2021may
+plot(r.chl.2021may) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2021 jun
+raster_2021jun <- "A20211522021181.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2021juna <- raster(raster_2021jun)
+raster_2021juna
+
+r.chl.2021jun <- crop(raster_2021juna, ROI)
+
+chl.2021jun <- raster::extract(r.chl.2021jun, extract.pts, sp = T)
+
+plot(r.chl.2021jun) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2021 jul
+raster_2021jul <- "A20211822021212.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2021jula <- raster(raster_2021jul)
+raster_2021jula
+
+r.chl.2021jul <- crop(raster_2021jula, ROI)
+
+chl.2021jul <- raster::extract(r.chl.2021jul, extract.pts, sp = T)
+
+plot(r.chl.2021jul) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+
+### 2021 aug
+raster_2021aug <- "A20212132021243.L3m_MO_CHL_chlor_a_4km.nc"
+raster_2021auga <- raster(raster_2021aug)
+raster_2021auga
+
+r.chl.2021aug <- crop(raster_2021auga, ROI)
+
+chl.2021aug <- raster::extract(r.chl.2021aug, extract.pts, sp = T)
+
+plot(r.chl.2021aug) +  points(lon.pts, lat.pts, pch = 3, col = "red")
+```
+
+```{r}
+### 2008 seasonal
+chl.2007.sep <- data.frame(chl.2007sep) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2007sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2007.oct <- data.frame(chl.2007oct) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2007oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2007.nov <- data.frame(chl.2007nov) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2007nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2008wb <- dplyr::bind_rows(chl.2007.sep, chl.2007.oct, chl.2007.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl_season_before = mean(chl)) %>% 
+  mutate(year = 2008) %>% 
+  mutate(season = "W")
+
+chl.2007.dec <- data.frame(chl.2007dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2007dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2008.jan <- data.frame(chl.2008jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2008jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2008.feb <- data.frame(chl.2008feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2008feb) %>% 
+  dplyr::select(site, chl)
+
+chl.2008w <- dplyr::bind_rows(chl.2007.dec, chl.2008.jan, chl.2008.feb) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2008) %>% 
+  mutate(season = "W")
+
+chl.2008.w <- merge(chl.2008w, chl.2008wb)
+
+chl.2008spb <- chl.2008w %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2008) %>% 
+  mutate(season = "Sp") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2008.mar <- data.frame(chl.2008mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2008mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2008.apr <- data.frame(chl.2008apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2008apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2008.may <- data.frame(chl.2008may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2008may) %>% 
+  dplyr::select(site, chl)
+
+chl.2008sp <- dplyr::bind_rows(chl.2008.mar, chl.2008.apr, chl.2008.may) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2008) %>% 
+  mutate(season = "Sp")
+
+chl.2008.sp <- merge(chl.2008sp, chl.2008spb)
+
+##summer 2008 
+chl.2008sub <- chl.2008sp %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2008) %>% 
+  mutate(season = "Su") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2008.jun <- data.frame(chl.2008jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2008jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2008.jul <- data.frame(chl.2008jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2008jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2008.aug <- data.frame(chl.2008aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2008aug) %>% 
+  dplyr::select(site, chl)
+
+chl.2008su <- dplyr::bind_rows(chl.2008.jun, chl.2008.jul, chl.2008.aug) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2008) %>% 
+  mutate(season = "Su")
+
+chl.2008.su <- merge(chl.2008su, chl.2008sub)
+
+##fall 2008 
+chl.2008fb <- chl.2008su %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2008) %>% 
+  mutate(season = "F") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2008.sep <- data.frame(chl.2008sep) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2008sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2008.oct <- data.frame(chl.2008oct) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2008oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2008.nov <- data.frame(chl.2008nov) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2008nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2008f <- dplyr::bind_rows(chl.2008.sep, chl.2008.oct, chl.2008.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2008) %>% 
+  mutate(season = "F")
+
+chl.2008.f <- merge(chl.2008f, chl.2008fb)
+
+### 2009 seasonal
+
+chl.2009wb <- chl.2008f %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2009) %>% 
+  mutate(season = "W") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+chl.2008.dec <- data.frame(chl.2008dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2008dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2009.jan <- data.frame(chl.2009jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2009jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2009.feb <- data.frame(chl.2009feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2009feb) %>% 
+  dplyr::select(site, chl)
+
+chl.2009w <- dplyr::bind_rows(chl.2008.dec, chl.2009.jan, chl.2009.feb) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2009) %>% 
+  mutate(season = "W")
+
+chl.2009.w <- merge(chl.2009w, chl.2009wb)
+
+chl.2009spb <- chl.2009w %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2009) %>% 
+  mutate(season = "Sp") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2009.mar <- data.frame(chl.2009mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2009mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2009.apr <- data.frame(chl.2009apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2009apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2009.may <- data.frame(chl.2009may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2009may) %>% 
+  dplyr::select(site, chl)
+
+chl.2009sp <- dplyr::bind_rows(chl.2009.mar, chl.2009.apr, chl.2009.may) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2009) %>% 
+  mutate(season = "Sp")
+
+chl.2009.sp <- merge(chl.2009sp, chl.2009spb)
+
+##summer 2009 
+chl.2009sub <- chl.2009sp %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2009) %>% 
+  mutate(season = "Su") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2009.jun <- data.frame(chl.2009jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2009jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2009.jul <- data.frame(chl.2009jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2009jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2009.aug <- data.frame(chl.2009aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2009aug) %>% 
+  dplyr::select(site, chl)
+
+chl.2009su <- dplyr::bind_rows(chl.2009.jun, chl.2009.jul, chl.2009.aug) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2009) %>% 
+  mutate(season = "Su")
+
+chl.2009.su <- merge(chl.2009su, chl.2009sub)
+
+##fall 2009 
+chl.2009fb <- chl.2009su %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2009) %>% 
+  mutate(season = "F") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2009.sep <- data.frame(chl.2009sep) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2009sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2009.oct <- data.frame(chl.2009oct) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2009oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2009.nov <- data.frame(chl.2009nov) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2009nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2009f <- dplyr::bind_rows(chl.2009.sep, chl.2009.oct, chl.2009.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2009) %>% 
+  mutate(season = "F")
+
+chl.2009.f <- merge(chl.2009f, chl.2009fb)
+
+### 2010 seasonal
+
+chl.2010wb <- chl.2009f %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2010) %>% 
+  mutate(season = "W") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+chl.2009.dec <- data.frame(chl.2009dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2009dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2010.jan <- data.frame(chl.2010jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2010jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2010.feb <- data.frame(chl.2010feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2010feb) %>% 
+  dplyr::select(site, chl)
+
+chl.2010w <- dplyr::bind_rows(chl.2009.dec, chl.2010.jan, chl.2010.feb) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2010) %>% 
+  mutate(season = "W")
+
+chl.2010.w <- merge(chl.2010w, chl.2010wb)
+
+chl.2010spb <- chl.2010w %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2010) %>% 
+  mutate(season = "Sp") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2010.mar <- data.frame(chl.2010mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2010mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2010.apr <- data.frame(chl.2010apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2010apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2010.may <- data.frame(chl.2010may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2010may) %>% 
+  dplyr::select(site, chl)
+
+chl.2010sp <- dplyr::bind_rows(chl.2010.mar, chl.2010.apr, chl.2010.may) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2010) %>% 
+  mutate(season = "Sp")
+
+chl.2010.sp <- merge(chl.2010sp, chl.2010spb)
+
+##summer 2010
+chl.2010sub <- chl.2010sp %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2010) %>% 
+  mutate(season = "Su") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2010.jun <- data.frame(chl.2010jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2010jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2010.jul <- data.frame(chl.2010jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2010jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2010.aug <- data.frame(chl.2010aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2010aug) %>% 
+  dplyr::select(site, chl)
+
+chl.2010su <- dplyr::bind_rows(chl.2010.jun, chl.2010.jul, chl.2010.aug) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2010) %>% 
+  mutate(season = "Su")
+
+chl.2010.su <- merge(chl.2010su, chl.2010sub)
+
+##fall 2009 
+chl.2010fb <- chl.2010su %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2010) %>% 
+  mutate(season = "F") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2010.sep <- data.frame(chl.2010sep) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2010sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2010.oct <- data.frame(chl.2010oct) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2010oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2010.nov <- data.frame(chl.2010nov) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2010nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2010f <- dplyr::bind_rows(chl.2010.sep, chl.2010.oct, chl.2010.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2010) %>% 
+  mutate(season = "F")
+
+chl.2010.f <- merge(chl.2010f, chl.2010fb)
+
+### 2011 seasonal
+
+chl.2011wb <- chl.2010f %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2011) %>% 
+  mutate(season = "W") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+chl.2010.dec <- data.frame(chl.2010dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2010dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2011.jan <- data.frame(chl.2011jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2011jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2011.feb <- data.frame(chl.2011feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2011feb) %>% 
+  dplyr::select(site, chl)
+
+chl.2011w <- dplyr::bind_rows(chl.2010.dec, chl.2011.jan, chl.2011.feb) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2011) %>% 
+  mutate(season = "W")
+
+chl.2011.w <- merge(chl.2011w, chl.2011wb)
+
+chl.2011spb <- chl.2011w %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2011) %>% 
+  mutate(season = "Sp") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2011.mar <- data.frame(chl.2011mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2011mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2011.apr <- data.frame(chl.2011apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2011apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2011.may <- data.frame(chl.2011may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2011may) %>% 
+  dplyr::select(site, chl)
+
+chl.2011sp <- dplyr::bind_rows(chl.2011.mar, chl.2011.apr, chl.2011.may) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2011) %>% 
+  mutate(season = "Sp")
+
+chl.2011.sp <- merge(chl.2011sp, chl.2011spb)
+
+##summer 2011
+chl.2011sub <- chl.2011sp %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2011) %>% 
+  mutate(season = "Su") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2011.jun <- data.frame(chl.2011jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2011jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2011.jul <- data.frame(chl.2011jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2011jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2011.aug <- data.frame(chl.2011aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2011aug) %>% 
+  dplyr::select(site, chl)
+
+chl.2011su <- dplyr::bind_rows(chl.2011.jun, chl.2011.jul, chl.2011.aug) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2011) %>% 
+  mutate(season = "Su")
+
+chl.2011.su <- merge(chl.2011su, chl.2011sub)
+
+##fall 2011 
+chl.2011fb <- chl.2011su %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2011) %>% 
+  mutate(season = "F") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2011.sep <- data.frame(chl.2011sep) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2011sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2011.oct <- data.frame(chl.2011oct) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2011oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2011.nov <- data.frame(chl.2011nov) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2011nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2011f <- dplyr::bind_rows(chl.2011.sep, chl.2011.oct, chl.2011.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2011) %>% 
+  mutate(season = "F")
+
+chl.2011.f <- merge(chl.2011f, chl.2011fb)
+
+### 2012 seasonal
+
+chl.2012wb <- chl.2011f %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2012) %>% 
+  mutate(season = "W") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+chl.2011.dec <- data.frame(chl.2011dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2011dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2012.jan <- data.frame(chl.2012jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2012jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2012.feb <- data.frame(chl.2012feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2012feb) %>% 
+  dplyr::select(site, chl)
+
+chl.2012w <- dplyr::bind_rows(chl.2011.dec, chl.2012.jan, chl.2012.feb) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2012) %>% 
+  mutate(season = "W")
+
+chl.2012.w <- merge(chl.2012w, chl.2012wb)
+
+chl.2012spb <- chl.2012w %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2012) %>% 
+  mutate(season = "Sp") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2012.mar <- data.frame(chl.2012mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2012mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2012.apr <- data.frame(chl.2012apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2012apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2012.may <- data.frame(chl.2012may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2012may) %>% 
+  dplyr::select(site, chl)
+
+chl.2012sp <- dplyr::bind_rows(chl.2012.mar, chl.2012.apr, chl.2012.may) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2012) %>% 
+  mutate(season = "Sp")
+
+chl.2012.sp <- merge(chl.2012sp, chl.2012spb)
+
+##summer 2012
+chl.2012sub <- chl.2012sp %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2012) %>% 
+  mutate(season = "Su") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2012.jun <- data.frame(chl.2012jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2012jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2012.jul <- data.frame(chl.2012jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2012jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2012.aug <- data.frame(chl.2012aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2012aug) %>% 
+  dplyr::select(site, chl)
+
+chl.2012su <- dplyr::bind_rows(chl.2012.jun, chl.2012.jul, chl.2012.aug) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2012) %>% 
+  mutate(season = "Su")
+
+chl.2012.su <- merge(chl.2012su, chl.2012sub)
+
+##fall 2012 
+chl.2012fb <- chl.2012su %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2012) %>% 
+  mutate(season = "F") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2012.sep <- data.frame(chl.2012sep) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2012sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2012.oct <- data.frame(chl.2012oct) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2012oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2012.nov <- data.frame(chl.2012nov) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2012nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2012f <- dplyr::bind_rows(chl.2012.sep, chl.2012.oct, chl.2012.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2012) %>% 
+  mutate(season = "F")
+
+chl.2012.f <- merge(chl.2012f, chl.2012fb)
+
+## 2013
+
+chl.2013wb <- chl.2012f %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2013) %>% 
+  mutate(season = "W") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+chl.2012.dec <- data.frame(chl.2012dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2012dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2013.jan <- data.frame(chl.2013jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2013jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2013.feb <- data.frame(chl.2013feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2013feb) %>% 
+  dplyr::select(site, chl)
+
+chl.2013w <- dplyr::bind_rows(chl.2012.dec, chl.2013.jan, chl.2013.feb) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2013) %>% 
+  mutate(season = "W")
+
+chl.2013.w <- merge(chl.2013w, chl.2013wb)
+
+chl.2013spb <- chl.2013w %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2013) %>% 
+  mutate(season = "Sp") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2013.mar <- data.frame(chl.2013mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2013mar) %>% 
+  dplyr::select(site, chl) %>% 
+  mutate(chl = case_when(
+    chl >= 20.0 ~ "NA",
+    TRUE ~ as.character(as.numeric(chl)))) %>% 
+  mutate(chl = as.numeric(chl))
+
+chl.2013.apr <- data.frame(chl.2013apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2013apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2013.may <- data.frame(chl.2013may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2013may) %>% 
+  dplyr::select(site, chl)
+
+chl.2013sp <- dplyr::bind_rows(chl.2013.mar, chl.2013.apr, chl.2013.may) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2013) %>% 
+  mutate(season = "Sp")
+
+chl.2013.sp <- merge(chl.2013sp, chl.2013spb)
+
+##summer 2012
+chl.2013sub <- chl.2013sp %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2013) %>% 
+  mutate(season = "Su") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2013.jun <- data.frame(chl.2013jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2013jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2013.jul <- data.frame(chl.2013jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2013jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2013.aug <- data.frame(chl.2013aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2013aug) %>% 
+  dplyr::select(site, chl)
+
+chl.2013su <- dplyr::bind_rows(chl.2013.jun, chl.2013.jul, chl.2013.aug) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2013) %>% 
+  mutate(season = "Su")
+
+chl.2013.su <- merge(chl.2013su, chl.2013sub)
+
+##fall 2012 
+chl.2013fb <- chl.2013su %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2013) %>% 
+  mutate(season = "F") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2013.sep <- data.frame(chl.2013sep) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2013sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2013.oct <- data.frame(chl.2013oct) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2013oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2013.nov <- data.frame(chl.2013nov) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2013nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2013f <- dplyr::bind_rows(chl.2013.sep, chl.2013.oct, chl.2013.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2013) %>% 
+  mutate(season = "F")
+
+chl.2013.f <- merge(chl.2013f, chl.2013fb)
+
+## 2014
+
+chl.2014wb <- chl.2013f %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2014) %>% 
+  mutate(season = "W") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+chl.2013.dec <- data.frame(chl.2013dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2013dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2014.jan <- data.frame(chl.2014jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2014jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2014.feb <- data.frame(chl.2014feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2014feb) %>% 
+  dplyr::select(site, chl)
+
+chl.2014w <- dplyr::bind_rows(chl.2013.dec, chl.2014.jan, chl.2014.feb) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2014) %>% 
+  mutate(season = "W")
+
+chl.2014.w <- merge(chl.2014w, chl.2014wb)
+
+chl.2014spb <- chl.2014w %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2014) %>% 
+  mutate(season = "Sp") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2014.mar <- data.frame(chl.2014mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2014mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2014.apr <- data.frame(chl.2014apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2014apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2014.may <- data.frame(chl.2014may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2014may) %>% 
+  dplyr::select(site, chl)
+
+chl.2014sp <- dplyr::bind_rows(chl.2014.mar, chl.2014.apr, chl.2014.may) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2014) %>% 
+  mutate(season = "Sp")
+
+chl.2014.sp <- merge(chl.2014sp, chl.2014spb)
+
+##summer 2012
+chl.2014sub <- chl.2014sp %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2014) %>% 
+  mutate(season = "Su") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2014.jun <- data.frame(chl.2014jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2014jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2014.jul <- data.frame(chl.2014jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2014jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2014.aug <- data.frame(chl.2014aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2014aug) %>% 
+  dplyr::select(site, chl)
+
+chl.2014su <- dplyr::bind_rows(chl.2014.jun, chl.2014.jul, chl.2014.aug) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2014) %>% 
+  mutate(season = "Su")
+
+chl.2014.su <- merge(chl.2014su, chl.2014sub)
+
+##fall 2012 
+chl.2014fb <- chl.2014su %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2014) %>% 
+  mutate(season = "F") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2014.sep <- data.frame(chl.2014sep) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2014sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2014.oct <- data.frame(chl.2014oct) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2014oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2014.nov <- data.frame(chl.2014nov) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2014nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2014f <- dplyr::bind_rows(chl.2014.sep, chl.2014.oct, chl.2014.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2014) %>% 
+  mutate(season = "F")
+
+chl.2014.f <- merge(chl.2014f, chl.2014fb)
+
+## 2015
+
+chl.2015wb <- chl.2014f %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2015) %>% 
+  mutate(season = "W") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+chl.2014.dec <- data.frame(chl.2014dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2014dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2015.jan <- data.frame(chl.2015jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2015jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2015.feb <- data.frame(chl.2015feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2015feb) %>% 
+  dplyr::select(site, chl)
+
+chl.2015w <- dplyr::bind_rows(chl.2014.dec, chl.2015.jan, chl.2015.feb) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2015) %>% 
+  mutate(season = "W")
+
+chl.2015.w <- merge(chl.2015w, chl.2015wb)
+
+chl.2015spb <- chl.2015w %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2015) %>% 
+  mutate(season = "Sp") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2015.mar <- data.frame(chl.2015mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2015mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2015.apr <- data.frame(chl.2015apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2015apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2015.may <- data.frame(chl.2015may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2015may) %>% 
+  dplyr::select(site, chl)
+
+chl.2015sp <- dplyr::bind_rows(chl.2015.mar, chl.2015.apr, chl.2015.may) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2015) %>% 
+  mutate(season = "Sp")
+
+chl.2015.sp <- merge(chl.2015sp, chl.2015spb)
+
+##summer 2012
+chl.2015sub <- chl.2015sp %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2015) %>% 
+  mutate(season = "Su") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2015.jun <- data.frame(chl.2015jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2015jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2015.jul <- data.frame(chl.2015jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2015jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2015.aug <- data.frame(chl.2015aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2015aug) %>% 
+  dplyr::select(site, chl)
+
+chl.2015su <- dplyr::bind_rows(chl.2015.jun, chl.2015.jul, chl.2015.aug) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2015) %>% 
+  mutate(season = "Su")
+
+chl.2015.su <- merge(chl.2015su, chl.2015sub)
+
+##fall 2012 
+chl.2015fb <- chl.2015su %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2015) %>% 
+  mutate(season = "F") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2015.sep <- data.frame(chl.2015sep) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2015sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2015.oct <- data.frame(chl.2015oct) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2015oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2015.nov <- data.frame(chl.2015nov) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2015nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2015f <- dplyr::bind_rows(chl.2015.sep, chl.2015.oct, chl.2015.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2015) %>% 
+  mutate(season = "F")
+
+chl.2015.f <- merge(chl.2015f, chl.2015fb)
+
+## 2016
+
+chl.2016wb <- chl.2015f %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2016) %>% 
+  mutate(season = "W") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+chl.2015.dec <- data.frame(chl.2015dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2015dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2016.jan <- data.frame(chl.2016jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2016jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2016.feb <- data.frame(chl.2016feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2016feb) %>% 
+  dplyr::select(site, chl)
+
+chl.2016w <- dplyr::bind_rows(chl.2015.dec, chl.2016.jan, chl.2016.feb) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2016) %>% 
+  mutate(season = "W")
+
+chl.2016.w <- merge(chl.2016w, chl.2016wb)
+
+chl.2016spb <- chl.2016w %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2016) %>% 
+  mutate(season = "Sp") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2016.mar <- data.frame(chl.2016mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2016mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2016.apr <- data.frame(chl.2016apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2016apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2016.may <- data.frame(chl.2016may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2016may) %>% 
+  dplyr::select(site, chl)
+
+chl.2016sp <- dplyr::bind_rows(chl.2016.mar, chl.2016.apr, chl.2016.may) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2016) %>% 
+  mutate(season = "Sp")
+
+chl.2016.sp <- merge(chl.2016sp, chl.2016spb)
+
+##summer 2012
+chl.2016sub <- chl.2016sp %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2016) %>% 
+  mutate(season = "Su") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2016.jun <- data.frame(chl.2016jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2016jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2016.jul <- data.frame(chl.2016jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2016jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2016.aug <- data.frame(chl.2016aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2016aug) %>% 
+  dplyr::select(site, chl)
+
+chl.2016su <- dplyr::bind_rows(chl.2016.jun, chl.2016.jul, chl.2016.aug) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2016) %>% 
+  mutate(season = "Su")
+
+chl.2016.su <- merge(chl.2016su, chl.2016sub)
+
+##fall 2012 
+chl.2016fb <- chl.2016su %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2016) %>% 
+  mutate(season = "F") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2016.sep <- data.frame(chl.2016sep) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2016sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2016.oct <- data.frame(chl.2016oct) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2016oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2016.nov <- data.frame(chl.2016nov) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2016nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2016f <- dplyr::bind_rows(chl.2016.sep, chl.2016.oct, chl.2016.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2016) %>% 
+  mutate(season = "F")
+
+chl.2016.f <- merge(chl.2016f, chl.2016fb)
+
+
+## 2017
+
+chl.2017wb <- chl.2016f %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2017) %>% 
+  mutate(season = "W") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+chl.2016.dec <- data.frame(chl.2016dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2016dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2017.jan <- data.frame(chl.2017jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2017jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2017.feb <- data.frame(chl.2017feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2017feb) %>% 
+  dplyr::select(site, chl)
+
+chl.2017w <- dplyr::bind_rows(chl.2016.dec, chl.2017.jan, chl.2017.feb) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2017) %>% 
+  mutate(season = "W")
+
+chl.2017.w <- merge(chl.2017w, chl.2017wb)
+
+chl.2017spb <- chl.2017w %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2017) %>% 
+  mutate(season = "Sp") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2017.mar <- data.frame(chl.2017mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2017mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2017.apr <- data.frame(chl.2017apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2017apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2017.may <- data.frame(chl.2017may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2017may) %>% 
+  dplyr::select(site, chl)
+
+chl.2017sp <- dplyr::bind_rows(chl.2017.mar, chl.2017.apr, chl.2017.may) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2017) %>% 
+  mutate(season = "Sp")
+
+chl.2017.sp <- merge(chl.2017sp, chl.2017spb)
+
+##summer 2012
+chl.2017sub <- chl.2017sp %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2017) %>% 
+  mutate(season = "Su") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2017.jun <- data.frame(chl.2017jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2017jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2017.jul <- data.frame(chl.2017jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2017jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2017.aug <- data.frame(chl.2017aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2017aug) %>% 
+  dplyr::select(site, chl)
+
+chl.2017su <- dplyr::bind_rows(chl.2017.jun, chl.2017.jul, chl.2017.aug) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2017) %>% 
+  mutate(season = "Su")
+
+chl.2017.su <- merge(chl.2017su, chl.2017sub)
+
+##fall 2012 
+chl.2017fb <- chl.2017su %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2017) %>% 
+  mutate(season = "F") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2017.sep <- data.frame(chl.2017sep) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2017sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2017.oct <- data.frame(chl.2017oct) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2017oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2017.nov <- data.frame(chl.2017nov) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2017nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2017f <- dplyr::bind_rows(chl.2017.sep, chl.2017.oct, chl.2017.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2017) %>% 
+  mutate(season = "F")
+
+chl.2017.f <- merge(chl.2017f, chl.2017fb)
+
+
+## 2018
+
+chl.2018wb <- chl.2017f %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2018) %>% 
+  mutate(season = "W") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+chl.2017.dec <- data.frame(chl.2017dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2017dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2018.jan <- data.frame(chl.2018jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2018jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2018.feb <- data.frame(chl.2018feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2018feb) %>% 
+  dplyr::select(site, chl)
+
+chl.2018w <- dplyr::bind_rows(chl.2017.dec, chl.2018.jan, chl.2018.feb) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2018) %>% 
+  mutate(season = "W")
+
+chl.2018.w <- merge(chl.2018w, chl.2018wb)
+
+chl.2018spb <- chl.2018w %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2018) %>% 
+  mutate(season = "Sp") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2018.mar <- data.frame(chl.2018mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2018mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2018.apr <- data.frame(chl.2018apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2018apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2018.may <- data.frame(chl.2018may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2018may) %>% 
+  dplyr::select(site, chl)
+
+chl.2018sp <- dplyr::bind_rows(chl.2018.mar, chl.2018.apr, chl.2018.may) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2018) %>% 
+  mutate(season = "Sp")
+
+chl.2018.sp <- merge(chl.2018sp, chl.2018spb)
+
+##summer 2012
+chl.2018sub <- chl.2018sp %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2018) %>% 
+  mutate(season = "Su") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2018.jun <- data.frame(chl.2018jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2018jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2018.jul <- data.frame(chl.2018jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2018jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2018.aug <- data.frame(chl.2018aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2018aug) %>% 
+  dplyr::select(site, chl)
+
+chl.2018su <- dplyr::bind_rows(chl.2018.jun, chl.2018.jul, chl.2018.aug) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2018) %>% 
+  mutate(season = "Su")
+
+chl.2018.su <- merge(chl.2018su, chl.2018sub)
+
+##fall 2012 
+chl.2018fb <- chl.2018su %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2018) %>% 
+  mutate(season = "F") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2018.sep <- data.frame(chl.2018sep) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2018sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2018.oct <- data.frame(chl.2018oct) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2018oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2018.nov <- data.frame(chl.2018nov) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2018nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2018f <- dplyr::bind_rows(chl.2018.sep, chl.2018.oct, chl.2018.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2018) %>% 
+  mutate(season = "F")
+
+chl.2018.f <- merge(chl.2018f, chl.2018fb)
+
+## 2019
+
+chl.2019wb <- chl.2018f %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2019) %>% 
+  mutate(season = "W") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+chl.2018.dec <- data.frame(chl.2018dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2018dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2019.jan <- data.frame(chl.2019jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2019jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2019.feb <- data.frame(chl.2019feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2019feb) %>% 
+  dplyr::select(site, chl)
+
+chl.2019w <- dplyr::bind_rows(chl.2018.dec, chl.2019.jan, chl.2019.feb) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2019) %>% 
+  mutate(season = "W")
+
+chl.2019.w <- merge(chl.2019w, chl.2019wb)
+
+chl.2019spb <- chl.2019w %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2019) %>% 
+  mutate(season = "Sp") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2019.mar <- data.frame(chl.2019mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2019mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2019.apr <- data.frame(chl.2019apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2019apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2019.may <- data.frame(chl.2019may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2019may) %>% 
+  dplyr::select(site, chl)
+
+chl.2019sp <- dplyr::bind_rows(chl.2019.mar, chl.2019.apr, chl.2019.may) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2019) %>% 
+  mutate(season = "Sp")
+
+chl.2019.sp <- merge(chl.2019sp, chl.2019spb)
+
+##summer 2012
+chl.2019sub <- chl.2019sp %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2019) %>% 
+  mutate(season = "Su") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2019.jun <- data.frame(chl.2019jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2019jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2019.jul <- data.frame(chl.2019jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2019jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2019.aug <- data.frame(chl.2019aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2019aug) %>% 
+  dplyr::select(site, chl)
+
+chl.2019su <- dplyr::bind_rows(chl.2019.jun, chl.2019.jul, chl.2019.aug) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2019) %>% 
+  mutate(season = "Su")
+
+chl.2019.su <- merge(chl.2019su, chl.2019sub)
+
+##fall 2012 
+chl.2019fb <- chl.2019su %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2019) %>% 
+  mutate(season = "F") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2019.sep <- data.frame(chl.2019sep) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2019sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2019.oct <- data.frame(chl.2019oct) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2019oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2019.nov <- data.frame(chl.2019nov) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2019nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2019f <- dplyr::bind_rows(chl.2019.sep, chl.2019.oct, chl.2019.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2019) %>% 
+  mutate(season = "F")
+
+chl.2019.f <- merge(chl.2019f, chl.2019fb)
+
+## 2020
+
+chl.2020wb <- chl.2019f %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2020) %>% 
+  mutate(season = "W") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+chl.2019.dec <- data.frame(chl.2019dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2019dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2020.jan <- data.frame(chl.2020jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2020jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2020.feb <- data.frame(chl.2020feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2020feb) %>% 
+  dplyr::select(site, chl)
+
+chl.2020w <- dplyr::bind_rows(chl.2019.dec, chl.2020.jan, chl.2020.feb) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2020) %>% 
+  mutate(season = "W")
+
+chl.2020.w <- merge(chl.2020w, chl.2020wb)
+
+chl.2020spb <- chl.2020w %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2020) %>% 
+  mutate(season = "Sp") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2020.mar <- data.frame(chl.2020mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2020mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2020.apr <- data.frame(chl.2020apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2020apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2020.may <- data.frame(chl.2020may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2020may) %>% 
+  dplyr::select(site, chl)
+
+chl.2020sp <- dplyr::bind_rows(chl.2020.mar, chl.2020.apr, chl.2020.may) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2020) %>% 
+  mutate(season = "Sp")
+
+chl.2020.sp <- merge(chl.2020sp, chl.2020spb)
+
+##summer 2020
+chl.2020sub <- chl.2020sp %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2020) %>% 
+  mutate(season = "Su") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2020.jun <- data.frame(chl.2020jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2020jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2020.jul <- data.frame(chl.2020jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2020jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2020.aug <- data.frame(chl.2020aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2020aug) %>% 
+  dplyr::select(site, chl)
+
+chl.2020su <- dplyr::bind_rows(chl.2020.jun, chl.2020.jul, chl.2020.aug) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2020) %>% 
+  mutate(season = "Su")
+
+chl.2020.su <- merge(chl.2020su, chl.2020sub)
+
+##fall 2020 
+chl.2020fb <- chl.2020su %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2020) %>% 
+  mutate(season = "F") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2020.sep <- data.frame(chl.2020sep) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2020sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2020.oct <- data.frame(chl.2020oct) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2020oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2020.nov <- data.frame(chl.2020nov) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2020nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2020f <- dplyr::bind_rows(chl.2020.sep, chl.2020.oct, chl.2020.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2020) %>% 
+  mutate(season = "F")
+
+chl.2020.f <- merge(chl.2020f, chl.2020fb)
+
+## 2021
+
+chl.2021wb <- chl.2020f %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2021) %>% 
+  mutate(season = "W") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+chl.2020.dec <- data.frame(chl.2020dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2020dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2021.jan <- data.frame(chl.2021jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2021jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2021.feb <- data.frame(chl.2021feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2021feb) %>% 
+  dplyr::select(site, chl)
+
+chl.2021w <- dplyr::bind_rows(chl.2020.dec, chl.2021.jan, chl.2021.feb) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2021) %>% 
+  mutate(season = "W")
+
+chl.2021.w <- merge(chl.2021w, chl.2021wb)
+
+chl.2021spb <- chl.2021w %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2021) %>% 
+  mutate(season = "Sp") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2021.mar <- data.frame(chl.2021mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2021mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2021.apr <- data.frame(chl.2021apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2021apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2021.may <- data.frame(chl.2021may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2021may) %>% 
+  dplyr::select(site, chl)
+
+chl.2021sp <- dplyr::bind_rows(chl.2021.mar, chl.2021.apr, chl.2021.may) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2021) %>% 
+  mutate(season = "Sp")
+
+chl.2021.sp <- merge(chl.2021sp, chl.2021spb)
+
+##summer 2021
+chl.2021sub <- chl.2021sp %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2021) %>% 
+  mutate(season = "Su") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2021.jun <- data.frame(chl.2021jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2021jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2021.jul <- data.frame(chl.2021jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2021jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2021.aug <- data.frame(chl.2021aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2021aug) %>% 
+  dplyr::select(site, chl)
+
+chl.2021su <- dplyr::bind_rows(chl.2021.jun, chl.2021.jul, chl.2021.aug) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2021) %>% 
+  mutate(season = "Su")
+
+chl.2021.su <- merge(chl.2021su, chl.2021sub)
+
+chl_seasonal_lte <- bind_rows(chl.2008.w, chl.2008.sp, chl.2008.su, chl.2008.f,
+                              chl.2009.w, chl.2009.sp, chl.2009.su, chl.2009.f,
+                              chl.2010.w, chl.2010.sp, chl.2010.su, chl.2010.f,
+                              chl.2011.w, chl.2011.sp, chl.2011.su, chl.2011.f,
+                              chl.2012.w, chl.2012.sp, chl.2012.su, chl.2012.f,
+                              chl.2013.w, chl.2013.sp, chl.2013.su, chl.2013.f,
+                              chl.2014.w, chl.2014.sp, chl.2014.su, chl.2014.f,
+                              chl.2015.w, chl.2015.sp, chl.2015.su, chl.2015.f,
+                              chl.2016.w, chl.2016.sp, chl.2016.su, chl.2016.f,
+                              chl.2017.w, chl.2017.sp, chl.2017.su, chl.2017.f,
+                              chl.2018.w, chl.2018.sp, chl.2018.su, chl.2018.f,
+                              chl.2019.w, chl.2019.sp, chl.2019.su, chl.2019.f,
+                              chl.2020.w, chl.2020.sp, chl.2020.su, chl.2020.f,
+                              chl.2021.w, chl.2021.sp, chl.2021.su) %>% 
+  arrange(site, year)
+```
+
+```{r}
+chl.2002.sep <- data.frame(chl.2002sep) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2002sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2002.oct <- data.frame(chl.2002oct) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2002oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2002.nov <- data.frame(chl.2002nov) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2002nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2002.dec <- data.frame(chl.2002dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2002dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2002.jul <- data.frame(chl.2002jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2002jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2002.aug <- data.frame(chl.2002aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2002aug) %>% 
+  dplyr::select(site, chl)
+
+### 2003
+
+chl.2003.sep <- data.frame(chl.2003sep) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2003sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2003.oct <- data.frame(chl.2003oct) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2003oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2003.nov <- data.frame(chl.2003nov) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2003nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2003.dec <- data.frame(chl.2003dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2003.jan <- data.frame(chl.2003jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2003.feb <- data.frame(chl.2003feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003feb) %>% 
+  dplyr::select(site, chl)
+
+
+chl.2003.mar <- data.frame(chl.2003mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2003.apr <- data.frame(chl.2003apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2003.may <- data.frame(chl.2003may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003may) %>% 
+  dplyr::select(site, chl)
+
+chl.2003.jun <- data.frame(chl.2003jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2003.jul <- data.frame(chl.2003jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2003.aug <- data.frame(chl.2003aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003aug) %>% 
+  dplyr::select(site, chl)
+
+### 2004
+
+chl.2004.sep <- data.frame(chl.2004sep) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2004sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2004.oct <- data.frame(chl.2004oct) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2004oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2004.nov <- data.frame(chl.2004nov) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2004nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2004.dec <- data.frame(chl.2004dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2004.jan <- data.frame(chl.2004jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2004.feb <- data.frame(chl.2004feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004feb) %>% 
+  dplyr::select(site, chl)
+
+
+chl.2004.mar <- data.frame(chl.2004mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2004.apr <- data.frame(chl.2004apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2004.may <- data.frame(chl.2004may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004may) %>% 
+  dplyr::select(site, chl)
+
+chl.2004.jun <- data.frame(chl.2004jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2004.jul <- data.frame(chl.2004jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2004.aug <- data.frame(chl.2004aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004aug) %>% 
+  dplyr::select(site, chl)
+
+### 2005
+
+chl.2005.sep <- data.frame(chl.2005sep) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2005sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2005.oct <- data.frame(chl.2005oct) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2005oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2005.nov <- data.frame(chl.2005nov) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2005nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2005.dec <- data.frame(chl.2005dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2005.jan <- data.frame(chl.2005jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2005.feb <- data.frame(chl.2005feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005feb) %>% 
+  dplyr::select(site, chl)
+
+
+chl.2005.mar <- data.frame(chl.2005mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2005.apr <- data.frame(chl.2005apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2005.may <- data.frame(chl.2005may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005may) %>% 
+  dplyr::select(site, chl)
+
+chl.2005.jun <- data.frame(chl.2005jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2005.jul <- data.frame(chl.2005jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2005.aug <- data.frame(chl.2005aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005aug) %>% 
+  dplyr::select(site, chl)
+
+
+#2006 
+
+chl.2006.sep <- data.frame(chl.2006sep) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2006sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2006.oct <- data.frame(chl.2006oct) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2006oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2006.nov <- data.frame(chl.2006nov) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2006nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2006.dec <- data.frame(chl.2006dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2006.jan <- data.frame(chl.2006jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2006.feb <- data.frame(chl.2006feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006feb) %>% 
+  dplyr::select(site, chl)
+
+
+chl.2006.mar <- data.frame(chl.2006mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2006.apr <- data.frame(chl.2006apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2006.may <- data.frame(chl.2006may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006may) %>% 
+  dplyr::select(site, chl)
+
+chl.2006.jun <- data.frame(chl.2006jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2006.jul <- data.frame(chl.2006jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2006.aug <- data.frame(chl.2006aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006aug) %>% 
+  dplyr::select(site, chl)
+
+##2007
+
+chl.2007.jan <- data.frame(chl.2007jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2007jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2007.feb <- data.frame(chl.2007feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2007feb) %>% 
+  dplyr::select(site, chl)
+
+
+chl.2007.mar <- data.frame(chl.2007mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2007mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2007.apr <- data.frame(chl.2007apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2007apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2007.may <- data.frame(chl.2007may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2007may) %>% 
+  dplyr::select(site, chl)
+
+chl.2007.jun <- data.frame(chl.2007jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2007jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2007.jul <- data.frame(chl.2007jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2007jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2007.aug <- data.frame(chl.2007aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2007aug) %>% 
+  dplyr::select(site, chl)
+
+###########################################################################
+
+chl.2002.sep <- data.frame(chl.2002sep) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2002sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2002.oct <- data.frame(chl.2002oct) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2002oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2002.nov <- data.frame(chl.2002nov) %>% 
+  dplyr::mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  dplyr::mutate(chl = chl.2002nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2003wb <- dplyr::bind_rows(chl.2002.sep, chl.2002.oct, chl.2002.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl_season_before = mean(chl)) %>% 
+  mutate(year = 2003) %>% 
+  mutate(season = "W")
+
+chl.2002.dec <- data.frame(chl.2002dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2002dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2003.jan <- data.frame(chl.2003jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2003.feb <- data.frame(chl.2003feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003feb) %>% 
+  dplyr::select(site, chl)
+
+chl.2003w <- dplyr::bind_rows(chl.2002.dec, chl.2003.jan, chl.2003.feb) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2003) %>% 
+  mutate(season = "W")
+
+chl.2003.w <- merge(chl.2003w, chl.2003wb)
+
+chl.2003spb <- chl.2003w %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2003) %>% 
+  mutate(season = "Sp") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2003.mar <- data.frame(chl.2003mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2003.apr <- data.frame(chl.2003apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2003.may <- data.frame(chl.2003may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003may) %>% 
+  dplyr::select(site, chl)
+
+chl.2003sp <- dplyr::bind_rows(chl.2003.mar, chl.2003.apr, chl.2003.may) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2003) %>% 
+  mutate(season = "Sp")
+
+chl.2003.sp <- merge(chl.2003sp, chl.2003spb)
+
+##summer 2008 
+chl.2003sub <- chl.2003sp %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2003) %>% 
+  mutate(season = "Su") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2003.jun <- data.frame(chl.2003jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2003.jul <- data.frame(chl.2003jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2003.aug <- data.frame(chl.2003aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003aug) %>% 
+  dplyr::select(site, chl)
+
+chl.2003su <- dplyr::bind_rows(chl.2003.jun, chl.2003.jul, chl.2003.aug) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2003) %>% 
+  mutate(season = "Su")
+
+chl.2003.su <- merge(chl.2003su, chl.2003sub)
+
+##fall 2008 
+chl.2003fb <- chl.2003su %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2003) %>% 
+  mutate(season = "F") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2003.sep <- data.frame(chl.2003sep) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2003.oct <- data.frame(chl.2003oct) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2003.nov <- data.frame(chl.2003nov) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2003f <- dplyr::bind_rows(chl.2003.sep, chl.2003.oct, chl.2003.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2003) %>% 
+  mutate(season = "F")
+
+chl.2003.f <- merge(chl.2003f, chl.2003fb)
+
+###########################################################################
+
+
+chl.2004wb <- dplyr::bind_rows(chl.2003.sep, chl.2003.oct, chl.2003.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl_season_before = mean(chl)) %>% 
+  mutate(year = 2004) %>% 
+  mutate(season = "W")
+
+chl.2003.dec <- data.frame(chl.2003dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2003dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2004.jan <- data.frame(chl.2004jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2004.feb <- data.frame(chl.2004feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004feb) %>% 
+  dplyr::select(site, chl)
+
+chl.2004w <- dplyr::bind_rows(chl.2003.dec, chl.2004.jan, chl.2004.feb) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2004) %>% 
+  mutate(season = "W")
+
+chl.2004.w <- merge(chl.2004w, chl.2004wb)
+
+chl.2004spb <- chl.2004w %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2004) %>% 
+  mutate(season = "Sp") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2004.mar <- data.frame(chl.2004mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2004.apr <- data.frame(chl.2004apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2004.may <- data.frame(chl.2004may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004may) %>% 
+  dplyr::select(site, chl)
+
+chl.2004sp <- dplyr::bind_rows(chl.2004.mar, chl.2004.apr, chl.2004.may) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2004) %>% 
+  mutate(season = "Sp")
+
+chl.2004.sp <- merge(chl.2004sp, chl.2004spb)
+
+##summer 2008 
+chl.2004sub <- chl.2004sp %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2004) %>% 
+  mutate(season = "Su") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2004.jun <- data.frame(chl.2004jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2004.jul <- data.frame(chl.2004jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2004.aug <- data.frame(chl.2004aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004aug) %>% 
+  dplyr::select(site, chl)
+
+chl.2004su <- dplyr::bind_rows(chl.2004.jun, chl.2004.jul, chl.2004.aug) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2004) %>% 
+  mutate(season = "Su")
+
+chl.2004.su <- merge(chl.2004su, chl.2004sub)
+
+##fall 2008 
+chl.2004fb <- chl.2004su %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2004) %>% 
+  mutate(season = "F") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2004.sep <- data.frame(chl.2004sep) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2004.oct <- data.frame(chl.2004oct) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2004.nov <- data.frame(chl.2004nov) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2004f <- dplyr::bind_rows(chl.2004.sep, chl.2004.oct, chl.2004.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2004) %>% 
+  mutate(season = "F")
+
+chl.2004.f <- merge(chl.2004f, chl.2004fb)
+
+###########################################################################
+
+
+chl.2005wb <- dplyr::bind_rows(chl.2004.sep, chl.2004.oct, chl.2004.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl_season_before = mean(chl)) %>% 
+  mutate(year = 2005) %>% 
+  mutate(season = "W")
+
+chl.2004.dec <- data.frame(chl.2004dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2004dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2005.jan <- data.frame(chl.2005jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2005.feb <- data.frame(chl.2005feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005feb) %>% 
+  dplyr::select(site, chl)
+
+chl.2005w <- dplyr::bind_rows(chl.2004.dec, chl.2005.jan, chl.2005.feb) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2005) %>% 
+  mutate(season = "W")
+
+chl.2005.w <- merge(chl.2005w, chl.2005wb)
+
+chl.2005spb <- chl.2005w %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2005) %>% 
+  mutate(season = "Sp") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2005.mar <- data.frame(chl.2005mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2005.apr <- data.frame(chl.2005apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2005.may <- data.frame(chl.2005may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005may) %>% 
+  dplyr::select(site, chl)
+
+chl.2005sp <- dplyr::bind_rows(chl.2005.mar, chl.2005.apr, chl.2005.may) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2005) %>% 
+  mutate(season = "Sp")
+
+chl.2005.sp <- merge(chl.2005sp, chl.2005spb)
+
+##summer 2008 
+chl.2005sub <- chl.2005sp %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2005) %>% 
+  mutate(season = "Su") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2005.jun <- data.frame(chl.2005jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2005.jul <- data.frame(chl.2005jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2005.aug <- data.frame(chl.2005aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005aug) %>% 
+  dplyr::select(site, chl)
+
+chl.2005su <- dplyr::bind_rows(chl.2005.jun, chl.2005.jul, chl.2005.aug) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2005) %>% 
+  mutate(season = "Su")
+
+chl.2005.su <- merge(chl.2005su, chl.2005sub)
+
+##fall 2008 
+chl.2005fb <- chl.2005su %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2005) %>% 
+  mutate(season = "F") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2005.sep <- data.frame(chl.2005sep) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2005.oct <- data.frame(chl.2005oct) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2005.nov <- data.frame(chl.2005nov) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2005f <- dplyr::bind_rows(chl.2005.sep, chl.2005.oct, chl.2005.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2005) %>% 
+  mutate(season = "F")
+
+chl.2005.f <- merge(chl.2005f, chl.2005fb)
+
+###########################################################################
+
+
+chl.2006wb <- dplyr::bind_rows(chl.2005.sep, chl.2005.oct, chl.2005.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl_season_before = mean(chl)) %>% 
+  mutate(year = 2006) %>% 
+  mutate(season = "W")
+
+chl.2005.dec <- data.frame(chl.2005dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2005dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2006.jan <- data.frame(chl.2006jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2006.feb <- data.frame(chl.2006feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006feb) %>% 
+  dplyr::select(site, chl)
+
+chl.2006w <- dplyr::bind_rows(chl.2005.dec, chl.2006.jan, chl.2006.feb) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2006) %>% 
+  mutate(season = "W")
+
+chl.2006.w <- merge(chl.2006w, chl.2006wb)
+
+chl.2006spb <- chl.2006w %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2006) %>% 
+  mutate(season = "Sp") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2006.mar <- data.frame(chl.2006mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2006.apr <- data.frame(chl.2006apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2006.may <- data.frame(chl.2006may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006may) %>% 
+  dplyr::select(site, chl)
+
+chl.2006sp <- dplyr::bind_rows(chl.2006.mar, chl.2006.apr, chl.2006.may) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2006) %>% 
+  mutate(season = "Sp")
+
+chl.2006.sp <- merge(chl.2006sp, chl.2006spb)
+
+##summer 2008 
+chl.2006sub <- chl.2006sp %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2006) %>% 
+  mutate(season = "Su") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2006.jun <- data.frame(chl.2006jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2006.jul <- data.frame(chl.2006jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2006.aug <- data.frame(chl.2006aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006aug) %>% 
+  dplyr::select(site, chl)
+
+chl.2006su <- dplyr::bind_rows(chl.2006.jun, chl.2006.jul, chl.2006.aug) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2006) %>% 
+  mutate(season = "Su")
+
+chl.2006.su <- merge(chl.2006su, chl.2006sub)
+
+##fall 2008 
+chl.2006fb <- chl.2006su %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2006) %>% 
+  mutate(season = "F") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2006.sep <- data.frame(chl.2006sep) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2006.oct <- data.frame(chl.2006oct) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2006.nov <- data.frame(chl.2006nov) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2006f <- dplyr::bind_rows(chl.2006.sep, chl.2006.oct, chl.2006.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2006) %>% 
+  mutate(season = "F")
+
+chl.2006.f <- merge(chl.2006f, chl.2006fb)
+
+###########################################################################
+
+
+chl.2007wb <- dplyr::bind_rows(chl.2006.sep, chl.2006.oct, chl.2006.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl_season_before = mean(chl)) %>% 
+  mutate(year = 2007) %>% 
+  mutate(season = "W")
+
+chl.2006.dec <- data.frame(chl.2006dec) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2006dec) %>% 
+  dplyr::select(site, chl)
+
+chl.2007.jan <- data.frame(chl.2007jan) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2007jan) %>% 
+  dplyr::select(site, chl)
+
+chl.2007.feb <- data.frame(chl.2007feb) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2007feb) %>% 
+  dplyr::select(site, chl)
+
+chl.2007w <- dplyr::bind_rows(chl.2006.dec, chl.2007.jan, chl.2007.feb) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2007) %>% 
+  mutate(season = "W")
+
+chl.2007.w <- merge(chl.2007w, chl.2007wb)
+
+chl.2007spb <- chl.2007w %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2007) %>% 
+  mutate(season = "Sp") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2007.mar <- data.frame(chl.2007mar) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2007mar) %>% 
+  dplyr::select(site, chl)
+
+chl.2007.apr <- data.frame(chl.2007apr) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2007apr) %>% 
+  dplyr::select(site, chl)
+
+chl.2007.may <- data.frame(chl.2007may) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2007may) %>% 
+  dplyr::select(site, chl)
+
+chl.2007sp <- dplyr::bind_rows(chl.2007.mar, chl.2007.apr, chl.2007.may) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2007) %>% 
+  mutate(season = "Sp")
+
+chl.2007.sp <- merge(chl.2007sp, chl.2007spb)
+
+##summer 2008 
+chl.2007sub <- chl.2007sp %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2007) %>% 
+  mutate(season = "Su") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2007.jun <- data.frame(chl.2007jun) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2007jun) %>% 
+  dplyr::select(site, chl)
+
+chl.2007.jul <- data.frame(chl.2007jul) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2007jul) %>% 
+  dplyr::select(site, chl)
+
+chl.2007.aug <- data.frame(chl.2007aug) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2007aug) %>% 
+  dplyr::select(site, chl)
+
+chl.2007su <- dplyr::bind_rows(chl.2007.jun, chl.2007.jul, chl.2007.aug) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2007) %>% 
+  mutate(season = "Su")
+
+chl.2007.su <- merge(chl.2007su, chl.2007sub)
+
+##fall 2008 
+chl.2007fb <- chl.2007su %>%
+  dplyr::select(site, chl) %>% 
+  mutate(chl_season_before = chl) %>% 
+  mutate(year = 2007) %>% 
+  mutate(season = "F") %>% 
+  dplyr::select(site, year, season, chl_season_before)
+
+
+chl.2007.sep <- data.frame(chl.2007sep) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2007sep) %>% 
+  dplyr::select(site, chl)
+
+chl.2007.oct <- data.frame(chl.2007oct) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2007oct) %>% 
+  dplyr::select(site, chl)
+
+chl.2007.nov <- data.frame(chl.2007nov) %>% 
+  mutate(site = c("ABUR", "AHND", "AQUE", "BULL", "CARP", "GOLB",
+                  "IVEE", "MOHK", "NAPL", "SCDI", "SCTW")) %>% 
+  mutate(chl = chl.2007nov) %>% 
+  dplyr::select(site, chl)
+
+chl.2007f <- dplyr::bind_rows(chl.2007.sep, chl.2007.oct, chl.2007.nov) %>% 
+  filter(chl != "NA") %>% 
+  group_by(site) %>% 
+  summarise(chl = mean(chl)) %>% 
+  mutate(year = 2007) %>% 
+  mutate(season = "F")
+
+chl.2007.f <- merge(chl.2007f, chl.2007fb)
+
+chl_seasonal_lte <- bind_rows(chl.2003.w, chl.2003.sp, chl.2003.su, chl.2003.f,
+                              chl.2004.w, chl.2004.sp, chl.2004.su, chl.2004.f,
+                              chl.2005.w, chl.2005.sp, chl.2005.su, chl.2005.f,
+                              chl.2006.w, chl.2006.sp, chl.2006.su, chl.2006.f,
+                              chl.2007.w, chl.2007.sp, chl.2007.su, chl.2007.f,
+                              chl.2008.w, chl.2008.sp, chl.2008.su, chl.2008.f,
+                              chl.2009.w, chl.2009.sp, chl.2009.su, chl.2009.f,
+                              chl.2010.w, chl.2010.sp, chl.2010.su, chl.2010.f,
+                              chl.2011.w, chl.2011.sp, chl.2011.su, chl.2011.f,
+                              chl.2012.w, chl.2012.sp, chl.2012.su, chl.2012.f,
+                              chl.2013.w, chl.2013.sp, chl.2013.su, chl.2013.f,
+                              chl.2014.w, chl.2014.sp, chl.2014.su, chl.2014.f,
+                              chl.2015.w, chl.2015.sp, chl.2015.su, chl.2015.f,
+                              chl.2016.w, chl.2016.sp, chl.2016.su, chl.2016.f,
+                              chl.2017.w, chl.2017.sp, chl.2017.su, chl.2017.f,
+                              chl.2018.w, chl.2018.sp, chl.2018.su, chl.2018.f,
+                              chl.2019.w, chl.2019.sp, chl.2019.su, chl.2019.f,
+                              chl.2020.w, chl.2020.sp, chl.2020.su, chl.2020.f,
+                              chl.2021.w, chl.2021.sp, chl.2021.su) %>% 
+  arrange(site, year) %>% 
+  filter(site != "ABUR") %>% 
+  filter(site != "AHND") %>% 
+  filter(site != "BULL") %>% 
+  filter(site != "GOLB") %>% 
+  filter(site != "SCDI") %>% 
+  filter(site != "SCTW")
+
+
+```
+
+```{r}
+chl_anom <- chl_seasonal_lte %>% 
+  group_by(season) %>% 
+  summarise(chl = mean(chl))
+
+chl_seasonal_anom <- chl_seasonal_lte %>% 
+  mutate(chl_anom = case_when(
+    season == "W" ~ (chl - 3.578954),
+    season == "Sp" ~ (chl - 8.639772),
+    season == "Su" ~ (chl - 2.643702),
+    season == "F" ~ (chl - 	2.563556))) %>% 
+  mutate(chl_anom_before = case_when(
+    season == "W" ~ (chl_season_before - 2.563556),
+    season == "Sp" ~ (chl_season_before - 3.578954),
+    season == "Su" ~ (chl_season_before - 8.639772),
+    season == "F" ~ (chl_season_before - 	2.643702)))
+```
+
+```{r}
+## Write csv document to be read in to "Michaud_et_al_Coms_Bio_Analysis_Code.Rmd"
+
+## write.csv(chl_seasonal_anom, "~/Library/CloudStorage/Box-Box/PHD/Chl_Script/chl_seasonal.csv", row.names = TRUE)
+```
+
+
+
